@@ -1,0 +1,705 @@
+@prefix :       <http://example.org/gadgetic#> .
+@prefix gad:    <http://example.org/gadgetic#> .
+@prefix owl:    <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+
+#################################################################
+# Ontology header
+#################################################################
+
+<http://example.org/gadgetic>
+  a owl:Ontology ;
+  rdfs:label "GadgeTic Ontology" ;
+  rdfs:comment "Ontology for gadget recommendations; Indonesia market device coverage; no PC." .
+
+#################################################################
+# Core classes
+#################################################################
+
+gad:Gadget            a owl:Class .
+gad:Laptop            a owl:Class ; rdfs:subClassOf gad:Gadget .
+gad:Smartphone        a owl:Class ; rdfs:subClassOf gad:Gadget .
+gad:Drone             a owl:Class ; rdfs:subClassOf gad:Gadget .
+gad:Smartwatch        a owl:Class ; rdfs:subClassOf gad:Gadget .
+gad:Smartband         a owl:Class ; rdfs:subClassOf gad:Gadget .
+gad:AudioDevice       a owl:Class ; rdfs:subClassOf gad:Gadget .
+gad:Mirrorless        a owl:Class ; rdfs:subClassOf gad:Gadget .
+
+gad:Component         a owl:Class .
+gad:CPU               a owl:Class ; rdfs:subClassOf gad:Component .
+gad:GPU               a owl:Class ; rdfs:subClassOf gad:Component .
+gad:RAM               a owl:Class ; rdfs:subClassOf gad:Component .
+gad:Storage           a owl:Class ; rdfs:subClassOf gad:Component .
+gad:SoC               a owl:Class ; rdfs:subClassOf gad:Component .
+gad:Battery           a owl:Class ; rdfs:subClassOf gad:Component .
+gad:Display           a owl:Class ; rdfs:subClassOf gad:Component .
+gad:CameraModule      a owl:Class ; rdfs:subClassOf gad:Component .
+gad:HealthSensor      a owl:Class ; rdfs:subClassOf gad:Component .
+
+gad:Persona           a owl:Class .
+gad:ProfilKebutuhan   a owl:Class .
+gad:Workload          a owl:Class .
+
+# Brand modeling
+gad:Brand             a owl:Class .
+gad:DeviceCategory    a owl:Class .
+
+#################################################################
+# Object properties
+#################################################################
+
+gad:hasComponent a owl:ObjectProperty ;
+  rdfs:domain gad:Gadget ;
+  rdfs:range  gad:Component ;
+  rdfs:label "has component" .
+
+gad:isComponentOf a owl:ObjectProperty ;
+  owl:inverseOf gad:hasComponent ;
+  rdfs:domain gad:Component ;
+  rdfs:range  gad:Gadget ;
+  rdfs:label "is component of" .
+
+gad:meetsRequirement a owl:ObjectProperty ;
+  rdfs:domain gad:Gadget ;
+  rdfs:range  gad:Workload ;
+  rdfs:label "meets requirement" .
+
+gad:needsComponent a owl:ObjectProperty ;
+  rdfs:domain gad:Workload ;
+  rdfs:range  gad:Component ;
+  rdfs:label "needs component" .
+
+gad:hasPersonaNeed a owl:ObjectProperty ;
+  rdfs:domain gad:Persona ;
+  rdfs:range  gad:ProfilKebutuhan ;
+  rdfs:label "has persona need" .
+
+gad:hasBrand a owl:ObjectProperty ;
+  rdfs:domain gad:Gadget ;
+  rdfs:range  gad:Brand ;
+  rdfs:label "has brand" .
+
+gad:brandForCategory a owl:ObjectProperty ;
+  rdfs:domain gad:Brand ;
+  rdfs:range  gad:DeviceCategory ;
+  rdfs:label "brand for category" .
+
+gad:parentBrand a owl:ObjectProperty ;
+  rdfs:domain gad:Brand ;
+  rdfs:range  gad:Brand ;
+  rdfs:label "parent brand" .
+
+# Inherit categories from parent brand: parentBrand o brandForCategory ⊑ brandForCategory
+gad:brandForCategory owl:propertyChainAxiom ( gad:parentBrand gad:brandForCategory ) .
+
+#################################################################
+# Data properties
+#################################################################
+
+gad:ramSize a owl:DatatypeProperty ;
+  rdfs:domain gad:RAM ;
+  rdfs:range xsd:integer ;
+  rdfs:label "RAM size in GB" .
+
+gad:supportsCUDA a owl:DatatypeProperty ;
+  rdfs:domain gad:GPU ;
+  rdfs:range xsd:boolean ;
+  rdfs:label "GPU supports CUDA" .
+
+gad:vramSize a owl:DatatypeProperty ;
+  rdfs:domain gad:GPU ;
+  rdfs:range xsd:integer ;
+  rdfs:label "VRAM size in GB" .
+
+gad:cpuModelName a owl:DatatypeProperty ;
+  rdfs:domain gad:CPU ;
+  rdfs:range xsd:string ;
+  rdfs:label "CPU model name" .
+
+gad:socModelName a owl:DatatypeProperty ;
+  rdfs:domain gad:SoC ;
+  rdfs:range xsd:string ;
+  rdfs:label "SoC model name" .
+
+gad:supportsNPU a owl:DatatypeProperty ;
+  rdfs:domain gad:SoC ;
+  rdfs:range xsd:boolean ;
+  rdfs:label "SoC has NPU" .
+
+gad:cellular5G a owl:DatatypeProperty ;
+  rdfs:domain gad:SoC ;
+  rdfs:range xsd:boolean ;
+  rdfs:label "Cellular 5G" .
+
+gad:batteryCapacitymAh a owl:DatatypeProperty ;
+  rdfs:domain gad:Battery ;
+  rdfs:range xsd:integer ;
+  rdfs:label "Battery capacity mAh" .
+
+gad:batteryCapacityWh a owl:DatatypeProperty ;
+  rdfs:domain gad:Battery ;
+  rdfs:range xsd:decimal ;
+  rdfs:label "Battery capacity Wh" .
+
+gad:storageSizeGB a owl:DatatypeProperty ;
+  rdfs:domain gad:Storage ;
+  rdfs:range xsd:integer ;
+  rdfs:label "Storage size GB" .
+
+gad:displaySizeInch a owl:DatatypeProperty ;
+  rdfs:domain gad:Display ;
+  rdfs:range xsd:decimal ;
+  rdfs:label "Display size inch" .
+
+gad:refreshRateHz a owl:DatatypeProperty ;
+  rdfs:domain gad:Display ;
+  rdfs:range xsd:integer ;
+  rdfs:label "Refresh rate Hz" .
+
+gad:panelType a owl:DatatypeProperty ;
+  rdfs:domain gad:Display ;
+  rdfs:range xsd:string ;
+  rdfs:label "Panel type" .
+
+gad:cameraMegapixel a owl:DatatypeProperty ;
+  rdfs:domain gad:CameraModule ;
+  rdfs:range xsd:integer ;
+  rdfs:label "Camera megapixel" .
+
+gad:hasOIS a owl:DatatypeProperty ;
+  rdfs:domain gad:CameraModule ;
+  rdfs:range xsd:boolean ;
+  rdfs:label "Has OIS" .
+
+gad:ibis a owl:DatatypeProperty ;
+  rdfs:domain gad:CameraModule ;
+  rdfs:range xsd:boolean ;
+  rdfs:label "In-body stabilization" .
+
+gad:sensorFormat a owl:DatatypeProperty ;
+  rdfs:domain gad:CameraModule ;
+  rdfs:range xsd:string ;
+  rdfs:label "Sensor format" .
+
+gad:lensMount a owl:DatatypeProperty ;
+  rdfs:domain gad:CameraModule ;
+  rdfs:range xsd:string ;
+  rdfs:label "Lens mount" .
+
+gad:video4k60 a owl:DatatypeProperty ;
+  rdfs:domain gad:CameraModule ;
+  rdfs:range xsd:boolean ;
+  rdfs:label "4K60 video capability" .
+
+gad:weightGr a owl:DatatypeProperty ;
+  rdfs:domain gad:Gadget ;
+  rdfs:range xsd:integer ;
+  rdfs:label "Weight in grams" .
+
+gad:maxFlightTimeMin a owl:DatatypeProperty ;
+  rdfs:domain gad:Drone ;
+  rdfs:range xsd:integer ;
+  rdfs:label "Max flight time in minutes" .
+
+gad:osName a owl:DatatypeProperty ;
+  rdfs:domain gad:Gadget ;
+  rdfs:range xsd:string ;
+  rdfs:label "Operating system name" .
+
+#################################################################
+# Workloads
+#################################################################
+
+gad:Training_Model_AI a gad:Workload ;
+  rdfs:label "Training Model AI" ;
+  gad:needsComponent gad:HighCUDA_GPU, gad:RAM32GB_or_More .
+
+gad:Video_Editing a gad:Workload ;
+  rdfs:label "Video Editing" ;
+  gad:needsComponent gad:HighVRAM_GPU, gad:RAM32GB_or_More .
+
+gad:Mobile_Build a gad:Workload ;
+  rdfs:label "Mobile Build" ;
+  gad:needsComponent gad:MidCPU, gad:RAM16GB_or_More .
+
+gad:Aerial_Videography a gad:Workload ;
+  rdfs:label "Aerial Videography" ;
+  gad:needsComponent gad:DroneCamera_4K60, gad:DroneBattery_LongFlight .
+
+gad:Wrist_Health_Tracking a gad:Workload ;
+  rdfs:label "Wrist Health Tracking" ;
+  gad:needsComponent gad:HealthSensorSuite, gad:Battery_LongLife .
+
+gad:Mobile_Photo_Video a gad:Workload ;
+  rdfs:label "Mobile Photo Video" ;
+  gad:needsComponent gad:SoC_With_NPU, gad:Camera_OIS, gad:Display_120Hz .
+
+gad:Gaming_1440p a gad:Workload ;
+  rdfs:label "Gaming 1440p" ;
+  gad:needsComponent gad:GPU_1440p, gad:RAM16GB_or_More .
+
+gad:Mirrorless_4k_Cine a gad:Workload ;
+  rdfs:label "Mirrorless 4K Cine" ;
+  gad:needsComponent gad:IBIS_Cam, gad:Cam_4K60 .
+
+#################################################################
+# Archetype components
+#################################################################
+
+gad:HighCUDA_GPU a gad:GPU ;
+  rdfs:label "GPU dengan CUDA" ;
+  gad:supportsCUDA true ;
+  gad:vramSize 8 .
+
+gad:HighVRAM_GPU a gad:GPU ;
+  rdfs:label "GPU VRAM tinggi" ;
+  gad:vramSize 12 .
+
+gad:GPU_1440p a gad:GPU ;
+  rdfs:label "GPU untuk 1440p gaming" ;
+  gad:supportsCUDA true ;
+  gad:vramSize 12 .
+
+gad:MidCPU a gad:CPU ;
+  rdfs:label "CPU menengah untuk kompilasi" ;
+  gad:cpuModelName "Any 6C/12T or better" .
+
+gad:RAM16GB_or_More a gad:RAM ;
+  rdfs:label "RAM 16GB atau lebih" ;
+  gad:ramSize 16 .
+
+gad:RAM32GB_or_More a gad:RAM ;
+  rdfs:label "RAM 32GB atau lebih" ;
+  gad:ramSize 32 .
+
+gad:SoC_With_NPU a gad:SoC ;
+  rdfs:label "SoC dengan NPU" ;
+  gad:supportsNPU true ;
+  gad:cellular5G true .
+
+gad:Camera_OIS a gad:CameraModule ;
+  rdfs:label "Camera dengan OIS" ;
+  gad:hasOIS true ;
+  gad:cameraMegapixel 50 .
+
+gad:Display_120Hz a gad:Display ;
+  rdfs:label "Display 120Hz" ;
+  gad:refreshRateHz 120 ;
+  gad:panelType "AMOLED" .
+
+gad:HealthSensorSuite a gad:HealthSensor ;
+  rdfs:label "Health sensor suite" .
+
+gad:Battery_LongLife a gad:Battery ;
+  rdfs:label "Baterai tahan lama" ;
+  gad:batteryCapacitymAh 5000 .
+
+gad:DroneCamera_4K60 a gad:CameraModule ;
+  rdfs:label "Drone camera 4K60" ;
+  gad:video4k60 true ;
+  gad:cameraMegapixel 48 .
+
+gad:DroneBattery_LongFlight a gad:Battery ;
+  rdfs:label "Drone long flight battery" ;
+  gad:batteryCapacityWh 35.0 .
+
+gad:IBIS_Cam a gad:CameraModule ;
+  rdfs:label "Mirrorless body with IBIS" ;
+  gad:ibis true ;
+  gad:sensorFormat "Full Frame" .
+
+gad:Cam_4K60 a gad:CameraModule ;
+  rdfs:label "Mirrorless 4K60 capable" ;
+  gad:video4k60 true .
+
+#################################################################
+# Concrete components
+#################################################################
+
+# CPUs
+gad:Ryzen7_7840HS a gad:CPU ; gad:cpuModelName "AMD Ryzen 7 7840HS" .
+gad:Ryzen9_7940HS a gad:CPU ; gad:cpuModelName "AMD Ryzen 9 7940HS" .
+gad:Core7_13700H  a gad:CPU ; gad:cpuModelName "Intel Core i7-13700H" .
+gad:Core7_14650HX a gad:CPU ; gad:cpuModelName "Intel Core i7-14650HX" .
+
+# GPUs
+gad:RTX_4050_6GB  a gad:GPU ; gad:supportsCUDA true ; gad:vramSize 6 .
+gad:RTX_4060_8GB  a gad:GPU ; gad:supportsCUDA true ; gad:vramSize 8 .
+gad:RTX_4070_12GB a gad:GPU ; gad:supportsCUDA true ; gad:vramSize 12 .
+
+# RAM and Storage
+gad:RAM8  a gad:RAM ; gad:ramSize 8 .
+gad:RAM12 a gad:RAM ; gad:ramSize 12 .
+gad:RAM16 a gad:RAM ; gad:ramSize 16 .
+gad:RAM32 a gad:RAM ; gad:ramSize 32 .
+gad:NVMe_512GB a gad:Storage ; gad:storageSizeGB 512 .
+gad:NVMe_1TB  a gad:Storage ; gad:storageSizeGB 1000 .
+
+# SoCs
+gad:Snapdragon_8s_Gen3 a gad:SoC ; gad:socModelName "Qualcomm Snapdragon 8s Gen 3" ; gad:supportsNPU true ; gad:cellular5G true .
+gad:Exynos_1480 a gad:SoC ; gad:socModelName "Samsung Exynos 1480" ; gad:supportsNPU true ; gad:cellular5G true .
+gad:Dimensity_8300 a gad:SoC ; gad:socModelName "MediaTek Dimensity 8300" ; gad:supportsNPU true ; gad:cellular5G true .
+gad:Apple_A17 a gad:SoC ; gad:socModelName "Apple A17" ; gad:supportsNPU true ; gad:cellular5G true .
+
+# Batteries and Displays
+gad:Battery_5000mAh a gad:Battery ; gad:batteryCapacitymAh 5000 .
+gad:Disp_6_7_AMOLED_120 a gad:Display ; gad:displaySizeInch 6.7 ; gad:refreshRateHz 120 ; gad:panelType "AMOLED" .
+gad:Disp_6_4_AMOLED_120 a gad:Display ; gad:displaySizeInch 6.4 ; gad:refreshRateHz 120 ; gad:panelType "AMOLED" .
+gad:Disp_6_1_OLED_60    a gad:Display ; gad:displaySizeInch 6.1 ; gad:refreshRateHz 60 ;  gad:panelType "OLED" .
+
+# Camera modules
+gad:Cam_50MP_OIS  a gad:CameraModule ; gad:cameraMegapixel 50 ; gad:hasOIS true .
+gad:Cam_200MP_OIS a gad:CameraModule ; gad:cameraMegapixel 200 ; gad:hasOIS true .
+
+#################################################################
+# Device categories to link brands
+#################################################################
+
+gad:cat_Smartphone a gad:DeviceCategory ; rdfs:label "Smartphone" .
+gad:cat_Laptop     a gad:DeviceCategory ; rdfs:label "Laptop" .
+gad:cat_Smartwatch a gad:DeviceCategory ; rdfs:label "Smartwatch" .
+gad:cat_Smartband  a gad:DeviceCategory ; rdfs:label "Smartband" .
+gad:cat_Audio      a gad:DeviceCategory ; rdfs:label "Audio" .
+gad:cat_Mirrorless a gad:DeviceCategory ; rdfs:label "Mirrorless" .
+gad:cat_Drone      a gad:DeviceCategory ; rdfs:label "Drone" .
+
+#################################################################
+# Brands in Indonesia
+#################################################################
+
+# Smartphone brands
+gad:Oppo     a gad:Brand ; rdfs:label "Oppo" ;     gad:brandForCategory gad:cat_Smartphone .
+gad:Samsung  a gad:Brand ; rdfs:label "Samsung" ;  gad:brandForCategory gad:cat_Smartphone .
+gad:vivo     a gad:Brand ; rdfs:label "vivo" ;     gad:brandForCategory gad:cat_Smartphone .
+gad:Xiaomi   a gad:Brand ; rdfs:label "Xiaomi" ;   gad:brandForCategory gad:cat_Smartphone .
+gad:Transsion a gad:Brand ; rdfs:label "Transsion" ; gad:brandForCategory gad:cat_Smartphone .
+gad:Infinix  a gad:Brand ; rdfs:label "Infinix" ;  gad:brandForCategory gad:cat_Smartphone ; gad:parentBrand gad:Transsion .
+gad:Tecno    a gad:Brand ; rdfs:label "Tecno" ;    gad:brandForCategory gad:cat_Smartphone ; gad:parentBrand gad:Transsion .
+gad:Itel     a gad:Brand ; rdfs:label "Itel" ;     gad:brandForCategory gad:cat_Smartphone ; gad:parentBrand gad:Transsion .
+gad:realme   a gad:Brand ; rdfs:label "realme" ;   gad:brandForCategory gad:cat_Smartphone .
+gad:Apple    a gad:Brand ; rdfs:label "Apple" ;    gad:brandForCategory gad:cat_Smartphone .
+
+# Laptop brands
+gad:Asus   a gad:Brand ; rdfs:label "Asus" ;   gad:brandForCategory gad:cat_Laptop .
+gad:Lenovo a gad:Brand ; rdfs:label "Lenovo" ; gad:brandForCategory gad:cat_Laptop .
+gad:Acer   a gad:Brand ; rdfs:label "Acer" ;   gad:brandForCategory gad:cat_Laptop .
+gad:HP     a gad:Brand ; rdfs:label "HP" ;     gad:brandForCategory gad:cat_Laptop .
+gad:Axioo  a gad:Brand ; rdfs:label "Axioo" ;  gad:brandForCategory gad:cat_Laptop .
+gad:Dell   a gad:Brand ; rdfs:label "Dell" ;   gad:brandForCategory gad:cat_Laptop .
+gad:Apple  gad:brandForCategory gad:cat_Laptop .
+
+# Wearable and Audio brands
+gad:Xiaomi  gad:brandForCategory gad:cat_Smartwatch, gad:cat_Smartband, gad:cat_Audio .
+gad:Apple   gad:brandForCategory gad:cat_Smartwatch, gad:cat_Audio .
+gad:Samsung gad:brandForCategory gad:cat_Smartwatch, gad:cat_Audio .
+gad:Huawei  a gad:Brand ; rdfs:label "Huawei" ; gad:brandForCategory gad:cat_Smartwatch, gad:cat_Smartband .
+gad:Garmin  a gad:Brand ; rdfs:label "Garmin" ; gad:brandForCategory gad:cat_Smartwatch .
+gad:Sony    a gad:Brand ; rdfs:label "Sony" ; gad:brandForCategory gad:cat_Audio .
+gad:JBL     a gad:Brand ; rdfs:label "JBL" ; gad:brandForCategory gad:cat_Audio .
+gad:Anker   a gad:Brand ; rdfs:label "Anker" ; gad:brandForCategory gad:cat_Audio .
+gad:JETE    a gad:Brand ; rdfs:label "JETE" ; gad:brandForCategory gad:cat_Audio .
+gad:Robot   a gad:Brand ; rdfs:label "Robot" ; gad:brandForCategory gad:cat_Audio .
+gad:Oraimo  a gad:Brand ; rdfs:label "Oraimo" ; gad:brandForCategory gad:cat_Audio .
+
+# Mirrorless camera brands
+gad:Canon      a gad:Brand ; rdfs:label "Canon" ;      gad:brandForCategory gad:cat_Mirrorless .
+gad:Fujifilm   a gad:Brand ; rdfs:label "Fujifilm" ;   gad:brandForCategory gad:cat_Mirrorless .
+gad:Nikon      a gad:Brand ; rdfs:label "Nikon" ;      gad:brandForCategory gad:cat_Mirrorless .
+gad:Panasonic  a gad:Brand ; rdfs:label "Panasonic" ;  gad:brandForCategory gad:cat_Mirrorless .
+gad:OM_System  a gad:Brand ; rdfs:label "OM System (Olympus)" ; gad:brandForCategory gad:cat_Mirrorless .
+gad:Sony       gad:brandForCategory gad:cat_Mirrorless .
+
+# Drone brands
+gad:DJI     a gad:Brand ; rdfs:label "DJI" ;     gad:brandForCategory gad:cat_Drone .
+gad:Autel   a gad:Brand ; rdfs:label "Autel" ;   gad:brandForCategory gad:cat_Drone .
+gad:Fimi    a gad:Brand ; rdfs:label "Fimi" ;    gad:brandForCategory gad:cat_Drone .
+gad:Insta360 a gad:Brand ; rdfs:label "Insta360" ; gad:brandForCategory gad:cat_Drone .
+
+#################################################################
+# Example devices with brands
+#################################################################
+
+# Smartphones
+gad:Xiaomi_14 a gad:Smartphone ;
+  rdfs:label "Xiaomi 14" ;
+  gad:hasBrand gad:Xiaomi ;
+  gad:hasComponent gad:Snapdragon_8s_Gen3, gad:Battery_5000mAh, gad:Disp_6_7_AMOLED_120, gad:RAM12, gad:NVMe_512GB, gad:Cam_50MP_OIS ;
+  gad:osName "Android" ;
+  gad:meetsRequirement gad:Mobile_Photo_Video .
+
+gad:Galaxy_A55 a gad:Smartphone ;
+  rdfs:label "Samsung Galaxy A55" ;
+  gad:hasBrand gad:Samsung ;
+  gad:hasComponent gad:Exynos_1480, gad:Battery_5000mAh, gad:Disp_6_4_AMOLED_120, gad:RAM8, gad:NVMe_512GB, gad:Cam_50MP_OIS ;
+  gad:osName "Android" ;
+  gad:meetsRequirement gad:Mobile_Photo_Video .
+
+gad:realme_12_Pro_Plus a gad:Smartphone ;
+  rdfs:label "realme 12 Pro+" ;
+  gad:hasBrand gad:realme ;
+  gad:hasComponent gad:Dimensity_8300, gad:Battery_5000mAh, gad:Disp_6_7_AMOLED_120, gad:RAM12, gad:NVMe_512GB, gad:Cam_200MP_OIS ;
+  gad:osName "Android" ;
+  gad:meetsRequirement gad:Mobile_Photo_Video .
+
+gad:vivo_V30 a gad:Smartphone ;
+  rdfs:label "vivo V30" ;
+  gad:hasBrand gad:vivo ;
+  gad:hasComponent gad:Dimensity_8300, gad:Battery_5000mAh, gad:Disp_6_7_AMOLED_120, gad:RAM12, gad:NVMe_512GB, gad:Cam_50MP_OIS ;
+  gad:osName "Android" .
+
+gad:Oppo_Reno12 a gad:Smartphone ;
+  rdfs:label "Oppo Reno12" ;
+  gad:hasBrand gad:Oppo ;
+  gad:hasComponent gad:Dimensity_8300, gad:Battery_5000mAh, gad:Disp_6_7_AMOLED_120, gad:RAM12, gad:NVMe_512GB, gad:Cam_50MP_OIS ;
+  gad:osName "Android" .
+
+gad:Infinix_Note_40_Pro a gad:Smartphone ;
+  rdfs:label "Infinix Note 40 Pro" ;
+  gad:hasBrand gad:Infinix ;
+  gad:hasComponent gad:Dimensity_8300, gad:Battery_5000mAh, gad:Disp_6_7_AMOLED_120, gad:RAM12, gad:NVMe_512GB, gad:Cam_50MP_OIS ;
+  gad:osName "Android" .
+
+gad:iPhone_15 a gad:Smartphone ;
+  rdfs:label "iPhone 15" ;
+  gad:hasBrand gad:Apple ;
+  gad:hasComponent gad:Apple_A17, gad:Disp_6_1_OLED_60, gad:RAM8, gad:NVMe_512GB, gad:Cam_50MP_OIS ;
+  gad:osName "iOS" .
+
+# Laptops
+gad:ASUS_TUF_A15_2024_RTX4060 a gad:Laptop ;
+  rdfs:label "ASUS TUF A15 2024 RTX4060" ;
+  gad:hasBrand gad:Asus ;
+  gad:hasComponent gad:Ryzen7_7840HS, gad:RTX_4060_8GB, gad:RAM16 ;
+  gad:meetsRequirement gad:Training_Model_AI, gad:Mobile_Build, gad:Gaming_1440p .
+
+gad:Lenovo_Legion_Pro5_16_RTX4070 a gad:Laptop ;
+  rdfs:label "Lenovo Legion Pro 5 16 RTX4070" ;
+  gad:hasBrand gad:Lenovo ;
+  gad:hasComponent gad:Ryzen9_7940HS, gad:RTX_4070_12GB, gad:RAM32 ;
+  gad:meetsRequirement gad:Training_Model_AI, gad:Video_Editing, gad:Gaming_1440p .
+
+gad:Acer_Nitro_16_2024 a gad:Laptop ;
+  rdfs:label "Acer Nitro 16 2024" ;
+  gad:hasBrand gad:Acer ;
+  gad:hasComponent gad:Ryzen7_7840HS, gad:RTX_4060_8GB, gad:RAM16 .
+
+gad:HP_Omen_16_RTX4060 a gad:Laptop ;
+  rdfs:label "HP Omen 16 RTX4060" ;
+  gad:hasBrand gad:HP ;
+  gad:hasComponent gad:Core7_13700H, gad:RTX_4060_8GB, gad:RAM32 .
+
+gad:Dell_G15_5530_RTX4060 a gad:Laptop ;
+  rdfs:label "Dell G15 5530 RTX4060" ;
+  gad:hasBrand gad:Dell ;
+  gad:hasComponent gad:Core7_13700H, gad:RTX_4060_8GB, gad:RAM16 .
+
+gad:Axioo_Pongo a gad:Laptop ;
+  rdfs:label "Axioo Pongo" ;
+  gad:hasBrand gad:Axioo ;
+  gad:hasComponent gad:Core7_13700H, gad:RTX_4060_8GB, gad:RAM16 .
+
+gad:MacBook_Pro_14_M3 a gad:Laptop ;
+  rdfs:label "MacBook Pro 14 M3" ;
+  gad:hasBrand gad:Apple ;
+  gad:hasComponent gad:RAM16 ;
+  gad:osName "macOS" ;
+  gad:meetsRequirement gad:Video_Editing .
+
+# Smartwatch and Smartband
+gad:Galaxy_Watch6 a gad:Smartwatch ;
+  rdfs:label "Samsung Galaxy Watch6" ;
+  gad:hasBrand gad:Samsung ;
+  gad:hasComponent gad:HealthSensorSuite, gad:Battery_LongLife ;
+  gad:osName "Wear OS" ;
+  gad:meetsRequirement gad:Wrist_Health_Tracking .
+
+gad:Apple_Watch_SE2 a gad:Smartwatch ;
+  rdfs:label "Apple Watch SE (2nd gen)" ;
+  gad:hasBrand gad:Apple ;
+  gad:hasComponent gad:HealthSensorSuite, gad:Battery_LongLife ;
+  gad:osName "watchOS" ;
+  gad:meetsRequirement gad:Wrist_Health_Tracking .
+
+gad:Xiaomi_Smart_Band_8 a gad:Smartband ;
+  rdfs:label "Xiaomi Smart Band 8" ;
+  gad:hasBrand gad:Xiaomi ;
+  gad:hasComponent gad:HealthSensorSuite ;
+  gad:meetsRequirement gad:Wrist_Health_Tracking .
+
+gad:Huawei_Watch_GT4 a gad:Smartwatch ;
+  rdfs:label "Huawei Watch GT 4" ;
+  gad:hasBrand gad:Huawei ;
+  gad:hasComponent gad:HealthSensorSuite ;
+  gad:meetsRequirement gad:Wrist_Health_Tracking .
+
+gad:Garmin_Forerunner_265 a gad:Smartwatch ;
+  rdfs:label "Garmin Forerunner 265" ;
+  gad:hasBrand gad:Garmin ;
+  gad:hasComponent gad:HealthSensorSuite ;
+  gad:meetsRequirement gad:Wrist_Health_Tracking .
+
+# Audio devices
+gad:AirPods_Pro_2 a gad:AudioDevice ;
+  rdfs:label "AirPods Pro 2" ;
+  gad:hasBrand gad:Apple .
+
+gad:Galaxy_Buds_FE a gad:AudioDevice ;
+  rdfs:label "Galaxy Buds FE" ;
+  gad:hasBrand gad:Samsung .
+
+gad:Sony_WH1000XM5 a gad:AudioDevice ;
+  rdfs:label "Sony WH-1000XM5" ;
+  gad:hasBrand gad:Sony .
+
+gad:JBL_Flip_6 a gad:AudioDevice ;
+  rdfs:label "JBL Flip 6" ;
+  gad:hasBrand gad:JBL .
+
+gad:Xiaomi_Buds_4_Pro a gad:AudioDevice ;
+  rdfs:label "Xiaomi Buds 4 Pro" ;
+  gad:hasBrand gad:Xiaomi .
+
+gad:Anker_Liberty_4 a gad:AudioDevice ;
+  rdfs:label "Anker Soundcore Liberty 4" ;
+  gad:hasBrand gad:Anker .
+
+gad:JETE_TWS_Pro a gad:AudioDevice ;
+  rdfs:label "JETE TWS Pro" ;
+  gad:hasBrand gad:JETE .
+
+gad:Robot_TWS_R3 a gad:AudioDevice ;
+  rdfs:label "Robot TWS R3" ;
+  gad:hasBrand gad:Robot .
+
+gad:Oraimo_FreePods_4 a gad:AudioDevice ;
+  rdfs:label "Oraimo FreePods 4" ;
+  gad:hasBrand gad:Oraimo .
+
+# Mirrorless cameras
+gad:Sony_A7_IV a gad:Mirrorless ;
+  rdfs:label "Sony A7 IV" ;
+  gad:hasBrand gad:Sony ;
+  gad:hasComponent gad:IBIS_Cam, gad:Cam_4K60 ;
+  gad:meetsRequirement gad:Mirrorless_4k_Cine .
+
+gad:Canon_EOS_R6_II a gad:Mirrorless ;
+  rdfs:label "Canon EOS R6 Mark II" ;
+  gad:hasBrand gad:Canon ;
+  gad:hasComponent gad:IBIS_Cam, gad:Cam_4K60 ;
+  gad:meetsRequirement gad:Mirrorless_4k_Cine .
+
+gad:Fujifilm_XS20 a gad:Mirrorless ;
+  rdfs:label "Fujifilm X-S20" ;
+  gad:hasBrand gad:Fujifilm ;
+  gad:hasComponent gad:Cam_4K60 ;
+  gad:meetsRequirement gad:Mirrorless_4k_Cine .
+
+# Drones
+gad:DJI_Mini_4_Pro a gad:Drone ;
+  rdfs:label "DJI Mini 4 Pro" ;
+  gad:hasBrand gad:DJI ;
+  gad:hasComponent gad:DroneCamera_4K60, gad:DroneBattery_LongFlight ;
+  gad:weightGr 249 ;
+  gad:maxFlightTimeMin 34 ;
+  gad:meetsRequirement gad:Aerial_Videography .
+
+gad:DJI_Air_3 a gad:Drone ;
+  rdfs:label "DJI Air 3" ;
+  gad:hasBrand gad:DJI ;
+  gad:hasComponent gad:DroneCamera_4K60, gad:DroneBattery_LongFlight ;
+  gad:weightGr 720 ;
+  gad:maxFlightTimeMin 46 ;
+  gad:meetsRequirement gad:Aerial_Videography .
+
+gad:Autel_EVO_LitePlus a gad:Drone ;
+  rdfs:label "Autel EVO Lite+" ;
+  gad:hasBrand gad:Autel ;
+  gad:hasComponent gad:DroneCamera_4K60, gad:DroneBattery_LongFlight ;
+  gad:meetsRequirement gad:Aerial_Videography .
+
+gad:Fimi_X8_SE a gad:Drone ;
+  rdfs:label "Fimi X8 SE" ;
+  gad:hasBrand gad:Fimi ;
+  gad:hasComponent gad:DroneCamera_4K60, gad:DroneBattery_LongFlight ;
+  gad:meetsRequirement gad:Aerial_Videography .
+
+#################################################################
+# Persona profiles and recommendation classes
+#################################################################
+
+# Link profile to prioritized workloads
+gad:prioritizesWorkload a owl:ObjectProperty ;
+  rdfs:domain gad:ProfilKebutuhan ;
+  rdfs:range  gad:Workload ;
+  rdfs:label  "prioritizes workload" .
+
+# Profiles
+gad:Kebutuhan_AI_Student a gad:ProfilKebutuhan ;
+  rdfs:label "Kebutuhan Mahasiswa AI/ML" ;
+  gad:prioritizesWorkload gad:Training_Model_AI ,
+                          gad:Mobile_Build .
+
+gad:Kebutuhan_MobileDev a gad:ProfilKebutuhan ;
+  rdfs:label "Kebutuhan Mobile Developer" ;
+  gad:prioritizesWorkload gad:Mobile_Build .
+
+gad:Kebutuhan_KreatorKonten a gad:ProfilKebutuhan ;
+  rdfs:label "Kebutuhan Kreator Konten" ;
+  gad:prioritizesWorkload gad:Video_Editing ,
+                          gad:Mobile_Photo_Video ,
+                          gad:Mirrorless_4k_Cine .
+
+# Personas
+gad:Persona_AI_Student a gad:Persona ;
+  rdfs:label "Mahasiswa AI/ML" ;
+  gad:hasPersonaNeed gad:Kebutuhan_AI_Student .
+
+gad:Persona_MobileDev a gad:Persona ;
+  rdfs:label "Mobile Developer" ;
+  gad:hasPersonaNeed gad:Kebutuhan_MobileDev .
+
+gad:Persona_KreatorKonten a gad:Persona ;
+  rdfs:label "Kreator Konten" ;
+  gad:hasPersonaNeed gad:Kebutuhan_KreatorKonten .
+
+# Recommended classes per persona
+gad:RecommendedFor_AI_Student a owl:Class ;
+  rdfs:label "Recommended for AI/ML Student" ;
+  owl:equivalentClass [
+    a owl:Class ;
+    owl:intersectionOf (
+      gad:Gadget
+      [ a owl:Restriction ;
+        owl:onProperty gad:meetsRequirement ;
+        owl:someValuesFrom [ a owl:Class ; owl:oneOf ( gad:Training_Model_AI gad:Mobile_Build ) ]
+      ]
+    )
+  ] .
+
+gad:RecommendedFor_MobileDev a owl:Class ;
+  rdfs:label "Recommended for Mobile Developer" ;
+  owl:equivalentClass [
+    a owl:Class ;
+    owl:intersectionOf (
+      gad:Gadget
+      [ a owl:Restriction ;
+        owl:onProperty gad:meetsRequirement ;
+        owl:someValuesFrom [ a owl:Class ; owl:oneOf ( gad:Mobile_Build ) ]
+      ]
+    )
+  ] .
+
+gad:RecommendedFor_KreatorKonten a owl:Class ;
+  rdfs:label "Recommended for Content Creator" ;
+  owl:equivalentClass [
+    a owl:Class ;
+    owl:intersectionOf (
+      gad:Gadget
+      [ a owl:Restriction ;
+        owl:onProperty gad:meetsRequirement ;
+        owl:someValuesFrom [ a owl:Class ; owl:oneOf ( gad:Video_Editing gad:Mobile_Photo_Video gad:Mirrorless_4k_Cine ) ]
+      ]
+    )
+  ] .
