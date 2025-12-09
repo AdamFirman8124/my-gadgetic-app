@@ -1,20 +1,23 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Pastikan Next.js tahu bahwa modul ini hanya untuk server
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
-        fs: false, // Jangan sertakan 'fs' di client-side
-        path: false, // Jangan sertakan 'path' di client-side
-        // Anda mungkin juga perlu menambahkan 'util' atau 'stream' jika ada error lain
+        // Modul Node.js yang dieksklusi dari client-side:
+        fs: false, 
+        path: false,
+        util: false, // Tambahan: seringkali digunakan oleh library Node
+        stream: false, // Tambahan: seringkali digunakan untuk I/O
+        // Tambahkan 'crypto' atau 'buffer' jika masih ada error
       };
     }
+    // Jika Anda menggunakan versi Next.js yang lebih baru (misalnya 14 ke atas)
+    // Anda mungkin perlu menambahkan ini untuk meng-eksternalisasi Communica dan N3
+    // experiments: {
+    //   topLevelAwait: true,
+    // },
     return config;
   },
-  // Opsi lain, jika ada error N3/Comunica yang terkait dengan Node polyfills
-  // experimental: {
-  //   serverComponentsExternalPackages: ['n3', '@comunica/query-sparql']
-  // }
 };
 
 module.exports = nextConfig;
