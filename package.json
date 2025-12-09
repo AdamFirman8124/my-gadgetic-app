@@ -11,6 +11,8 @@
   "dependencies": {
     "@comunica/query-sparql": "^4.5.0",
     "@rdfjs/types": "^2.0.1",
+    "framer-motion": "^12.23.25",
+    "lucide-react": "^0.556.0",
     "n3": "^1.26.0",
     "next": "16.0.8",
     "node-fetch": "^3.3.2",

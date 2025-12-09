@@ -1,0 +1,27 @@
+/* styles/global.css */
+body {
+  background-color: #F5F5F7; /* Apple Light Gray Background */
+  color: #1d1d1f; /* Apple Dark Text */
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased; /* Font lebih tajam */
+}
+
+/* Kustomisasi Scrollbar agar tipis & elegan */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+}
+
+/* Reset default browser styles untuk input */
+select, input {
+  font-family: inherit;
+  outline: none;
+}

@@ -1,53 +1,78 @@
 import { queryOntology } from '../../lib/sparql';
-import path from 'path';
 
-const prefixes = `
-    PREFIX gad: <http://example.org/gadgetic#>
-    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-`;
-
-const SPARQL_QUERY = `
-    ${prefixes}
-    SELECT DISTINCT ?gadgetLabel ?osName
-    WHERE {
-        ?gadget a gad:RecommendedFor_KreatorKonten .
-        ?gadget rdfs:label ?gadgetLabel .
-        OPTIONAL { ?gadget gad:osName ?osName . }
-    }
+const PREFIXES = `
+  PREFIX : <http://example.org/gadgetic#>
+  PREFIX gad: <http://example.org/gadgetic#>
+  PREFIX owl: <http://www.w3.org/2002/07/owl#>
+  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 `;
 
 export default async function handler(req, res) {
   try {
-    // pastikan path OWL benar untuk Vercel
-    const owlPath = path.join(process.cwd(), 'lib', 'ontology', 'kelas.owl');
-    const raw = await queryOntology(owlPath, SPARQL_QUERY);
+    const owlPath = 'lib/ontology/kelas.owl';
 
-    console.log('SPARQL raw result type:', typeof raw);
+    const query = `
+      ${PREFIXES}
+      SELECT ?id ?name ?categoryLabel ?brandName ?os ?ram ?storage ?price ?flightTime ?battery 
+             ?cameraMP ?sensorFormat ?ibis ?video4k
+      WHERE {
+        VALUES ?type { gad:Smartphone gad:Laptop gad:Drone gad:Smartwatch gad:Smartband gad:Headphones gad:AudioDevice gad:Mirrorless gad:Tablet }
+        
+        ?id a ?type .
+        ?id rdfs:label ?name .
+        BIND(STRAFTER(STR(?type), "#") AS ?categoryLabel)
 
-    // sesuaikan dengan struktur sebenarnya
-    const rows = Array.isArray(raw)
-      ? raw
-      : Array.isArray(raw.results?.bindings)
-      ? raw.results.bindings
-      : [];
+        OPTIONAL { 
+          ?id gad:hasBrand ?brand .
+          ?brand rdfs:label ?brandName .
+        }
 
-    const formattedResults = rows.map((item) => {
-      const gadgetLabel =
-        item.gadgetLabel?.value ?? item.gadgetLabel ?? item['gadgetLabel'];
-      const osName = item.osName?.value ?? item.osName ?? item['osName'];
+        OPTIONAL { ?id gad:osName ?os . }
+        OPTIONAL { ?id gad:priceIDR ?price . }
 
-      return {
-        label: gadgetLabel,
-        os: osName || 'N/A',
-      };
-    });
+        # --- SPEK LAPTOP/HP ---
+        OPTIONAL {
+          ?id gad:hasComponent ?ramComp .
+          ?ramComp a gad:RAM ;
+                   gad:ramSize ?ram .
+        }
+        OPTIONAL {
+          ?id gad:hasComponent ?storageComp .
+          ?storageComp a gad:Storage ;
+                       gad:storageSizeGB ?storage .
+        }
 
-    res.status(200).json(formattedResults);
+        # --- SPEK DRONE ---
+        OPTIONAL { ?id gad:maxFlightTimeMin ?flightTime . }
+
+        # --- SPEK BATERAI (UMUM) ---
+        OPTIONAL {
+            ?id gad:hasComponent ?batComp .
+            ?batComp gad:batteryCapacitymAh ?battery .
+        }
+
+        # --- SPEK KAMERA / MIRRORLESS / HP ---
+        OPTIONAL { 
+            ?id gad:hasComponent ?camComp .
+            # Gunakan UNION untuk menangkap berbagai properti komponen kamera
+            { ?camComp gad:cameraMegapixel ?cameraMP . }
+            UNION
+            { ?camComp gad:sensorFormat ?sensorFormat . }
+            UNION
+            { ?camComp gad:ibis ?ibis . }
+            UNION
+            { ?camComp gad:video4k60 ?video4k . }
+        }
+      }
+      ORDER BY ?categoryLabel ?price
+    `;
+
+    const data = await queryOntology(owlPath, query);
+    res.status(200).json(data);
+
   } catch (error) {
-    console.error('SPARQL Query Error:', error);
-    res.status(500).json({
-      error: 'Failed to execute SPARQL query',
-      details: error.message,
-    });
+    console.error('API Error:', error);
+    res.status(500).json({ error: 'Gagal memuat data', details: error.message });
   }
 }
