@@ -19,7 +19,7 @@ const SPARQL_QUERY = `
 export default async function handler(req, res) {
   try {
     // pastikan path OWL benar untuk Vercel
-    const owlPath = path.join(process.cwd(), 'ontology', 'kelas.owl');
+    const owlPath = path.join(process.cwd(), 'lib', 'ontology', 'kelas.owl');
     const raw = await queryOntology(owlPath, SPARQL_QUERY);
 
     console.log('SPARQL raw result type:', typeof raw);
