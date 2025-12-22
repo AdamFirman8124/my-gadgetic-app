@@ -8,105 +8,164 @@
 @prefix swrlb:  <http://www.w3.org/2003/11/swrlb#> .
 
 #################################################################
-# Ontology header
+# Ontology Header
 #################################################################
 
 <http://example.org/gadgetic>
   a owl:Ontology ;
-  rdfs:label "GadgeTic Ontology Ultimate Specs" ;
-  rdfs:comment "Ontology with 40 real-world gadgets, verified specs (Weight, Battery Wh/mAh, RAM Type), and SWRL rules." .
+  rdfs:label "GadgeTic Ontology SROIQ(D)" ;
+  rdfs:comment "Ontology with 90 devices. Optimized for SROIQ(D) expressivity by adding Disjoint Classes and Nominals." .
 
 #################################################################
-# Core classes
+# SROIQ Requirement: Disjoint Classes (Negation/Complement - 'C')
 #################################################################
 
-gad:Gadget            a owl:Class .
+# Ini adalah KUNCI agar statusnya berubah dari AL... menjadi S...
+# Kita menegaskan bahwa Laptop TIDAK BISA menjadi Smartphone, dst.
 
-gad:Laptop            a owl:Class ; 
-                      rdfs:subClassOf gad:Gadget ,
-                        [ a owl:Restriction ; owl:onProperty gad:hasComponent ; owl:minQualifiedCardinality "1"^^xsd:nonNegativeInteger ; owl:onClass gad:CPU ] ,
-                        [ a owl:Restriction ; owl:onProperty gad:hasComponent ; owl:minQualifiedCardinality "1"^^xsd:nonNegativeInteger ; owl:onClass gad:RAM ] .
+[ a owl:AllDisjointClasses ;
+  owl:members ( gad:Laptop gad:Smartphone gad:Drone gad:Smartwatch gad:Smartband gad:AudioDevice gad:Mirrorless )
+] .
 
-gad:Smartphone        a owl:Class ; 
-                      rdfs:subClassOf gad:Gadget ,
-                        [ a owl:Restriction ; owl:onProperty gad:hasComponent ; owl:minQualifiedCardinality "1"^^xsd:nonNegativeInteger ; owl:onClass gad:SoC ] .
-
-gad:Drone             a owl:Class ; rdfs:subClassOf gad:Gadget .
-gad:Smartwatch        a owl:Class ; rdfs:subClassOf gad:Gadget .
-gad:AudioDevice       a owl:Class ; rdfs:subClassOf gad:Gadget .
-gad:Mirrorless        a owl:Class ; rdfs:subClassOf gad:Gadget .
-
-gad:Component         a owl:Class .
-gad:CPU               a owl:Class ; rdfs:subClassOf gad:Component .
-gad:GPU               a owl:Class ; rdfs:subClassOf gad:Component .
-gad:RAM               a owl:Class ; rdfs:subClassOf gad:Component .
-gad:Storage           a owl:Class ; rdfs:subClassOf gad:Component .
-gad:SoC               a owl:Class ; rdfs:subClassOf gad:Component .
-gad:Battery           a owl:Class ; rdfs:subClassOf gad:Component .
-gad:Display           a owl:Class ; rdfs:subClassOf gad:Component .
-gad:CameraModule      a owl:Class ; rdfs:subClassOf gad:Component .
-gad:HealthSensor      a owl:Class ; rdfs:subClassOf gad:Component .
-
-gad:Persona           a owl:Class .
-gad:ProfilKebutuhan   a owl:Class .
-gad:Workload          a owl:Class .
-gad:Brand             a owl:Class .
-gad:DeviceCategory    a owl:Class .
+[ a owl:AllDisjointClasses ;
+  owl:members ( gad:CPU gad:GPU gad:RAM gad:Storage gad:SoC gad:Battery gad:Display gad:CameraModule gad:HealthSensor )
+] .
 
 #################################################################
-# Object properties
+# SROIQ Requirement: Nominals (Enumerated Classes - 'O')
 #################################################################
 
-gad:hasComponent  a owl:ObjectProperty ; owl:inverseOf gad:isComponentOf ; rdfs:domain gad:Gadget ; rdfs:range gad:Component .
-gad:isComponentOf a owl:ObjectProperty ; rdfs:domain gad:Component ; rdfs:range gad:Gadget .
+# Kelas yang didefinisikan dengan enumerasi individu (oneOf)
+gad:MarketLeaderBrand a owl:Class ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:oneOf ( gad:Apple gad:Samsung )
+    ] .
 
+gad:BigThreeCamera a owl:Class ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:oneOf ( gad:Sony gad:Canon gad:Nikon )
+    ] .
+
+#################################################################
+# Core Classes & Restrictions (Qualified Cardinality - 'Q')
+#################################################################
+
+gad:Gadget a owl:Class .
+
+gad:Laptop a owl:Class ;
+  rdfs:subClassOf gad:Gadget ,
+  [ a owl:Restriction ; owl:onProperty gad:hasComponent ; owl:minQualifiedCardinality "1"^^xsd:nonNegativeInteger ; owl:onClass gad:CPU ] ,
+  [ a owl:Restriction ; owl:onProperty gad:hasComponent ; owl:minQualifiedCardinality "1"^^xsd:nonNegativeInteger ; owl:onClass gad:RAM ] .
+
+gad:Smartphone a owl:Class ;
+  rdfs:subClassOf gad:Gadget ,
+  [ a owl:Restriction ; owl:onProperty gad:hasComponent ; owl:minQualifiedCardinality "1"^^xsd:nonNegativeInteger ; owl:onClass gad:SoC ] .
+
+gad:Drone a owl:Class ; rdfs:subClassOf gad:Gadget .
+gad:Smartwatch a owl:Class ; rdfs:subClassOf gad:Gadget .
+gad:Smartband a owl:Class ; rdfs:subClassOf gad:Gadget .
+gad:AudioDevice a owl:Class ; rdfs:subClassOf gad:Gadget .
+gad:Mirrorless a owl:Class ; rdfs:subClassOf gad:Gadget .
+
+gad:Component a owl:Class .
+gad:CPU a owl:Class ; rdfs:subClassOf gad:Component .
+gad:GPU a owl:Class ; rdfs:subClassOf gad:Component .
+gad:RAM a owl:Class ; rdfs:subClassOf gad:Component .
+gad:Storage a owl:Class ; rdfs:subClassOf gad:Component .
+gad:SoC a owl:Class ; rdfs:subClassOf gad:Component .
+gad:Battery a owl:Class ; rdfs:subClassOf gad:Component .
+gad:Display a owl:Class ; rdfs:subClassOf gad:Component .
+gad:CameraModule a owl:Class ; rdfs:subClassOf gad:Component .
+gad:HealthSensor a owl:Class ; rdfs:subClassOf gad:Component .
+
+gad:Workload a owl:Class .
+gad:Brand a owl:Class .
+gad:DeviceCategory a owl:Class .
+
+#################################################################
+# Object Properties (S, R, I)
+#################################################################
+
+# 1. Complex Roles (R): Asymmetric & Irreflexive
+# Syarat SROIQ: Properti yang punya karakteristik ini harus 'Simple' (tidak Transitif)
+gad:hasComponent a owl:ObjectProperty, owl:AsymmetricProperty, owl:IrreflexiveProperty ;
+    owl:inverseOf gad:isComponentOf ;
+    rdfs:domain gad:Gadget ;
+    rdfs:range gad:Component .
+
+gad:isComponentOf a owl:ObjectProperty, owl:AsymmetricProperty, owl:IrreflexiveProperty ;
+    rdfs:domain gad:Component ;
+    rdfs:range gad:Gadget .
+
+# 2. Functional & Disjoint (R)
+gad:hasBrand a owl:ObjectProperty, owl:FunctionalProperty ;
+    owl:inverseOf gad:isBrandOf ;
+    rdfs:domain gad:Gadget ;
+    rdfs:range gad:Brand ;
+    owl:propertyDisjointWith gad:hasComponent . 
+
+gad:isBrandOf a owl:ObjectProperty, owl:InverseFunctionalProperty ;
+    rdfs:domain gad:Brand ;
+    rdfs:range gad:Gadget .
+
+# 3. Transitive Properties (S implies Transitive)
+gad:parentBrand a owl:ObjectProperty , owl:TransitiveProperty ; 
+    owl:inverseOf gad:hasSubBrand ; 
+    rdfs:domain gad:Brand ; 
+    rdfs:range gad:Brand .
+
+gad:hasSubBrand a owl:ObjectProperty , owl:TransitiveProperty ; 
+    rdfs:domain gad:Brand ; 
+    rdfs:range gad:Brand .
+
+# 4. Property Chains (R)
+gad:brandForCategory a owl:ObjectProperty ; 
+    rdfs:domain gad:Brand ; 
+    rdfs:range gad:DeviceCategory ;
+    owl:propertyChainAxiom ( gad:parentBrand gad:brandForCategory ) .
+
+# 5. Standard Relations
 gad:meetsRequirement a owl:ObjectProperty ; owl:inverseOf gad:isRequirementMetBy ; rdfs:domain gad:Gadget ; rdfs:range gad:Workload .
 gad:isRequirementMetBy a owl:ObjectProperty ; rdfs:domain gad:Workload ; rdfs:range gad:Gadget .
 
-gad:hasBrand a owl:ObjectProperty , owl:ReflexiveProperty ; owl:inverseOf gad:isBrandOf ; rdfs:domain gad:Gadget ; rdfs:range gad:Brand .
-gad:isBrandOf a owl:ObjectProperty ; rdfs:domain gad:Brand ; rdfs:range gad:Gadget .
-
-gad:parentBrand a owl:ObjectProperty , owl:TransitiveProperty ; rdfs:domain gad:Brand ; rdfs:range gad:Brand .
-gad:brandForCategory a owl:ObjectProperty ; owl:propertyChainAxiom ( gad:parentBrand gad:brandForCategory ) .
-
 #################################################################
-# Data properties - ULTRA DETAILED SPECS
+# Data Properties (D)
 #################################################################
 
-# General Info
-gad:priceIDR a owl:DatatypeProperty ; rdfs:range xsd:integer ; rdfs:label "Harga dalam Rupiah" .
+gad:priceIDR a owl:DatatypeProperty ; rdfs:range xsd:integer .
 gad:releaseYear a owl:DatatypeProperty ; rdfs:range xsd:integer .
 gad:osName a owl:DatatypeProperty ; rdfs:range xsd:string .
-gad:weightGr a owl:DatatypeProperty ; rdfs:range xsd:integer ; rdfs:label "Berat dalam Gram" .
+gad:weightGr a owl:DatatypeProperty ; rdfs:range xsd:integer .
 
-# Appearance & Features
 gad:availableColor a owl:DatatypeProperty ; rdfs:domain gad:Gadget ; rdfs:range xsd:string .
 gad:keyFeature a owl:DatatypeProperty ; rdfs:domain gad:Gadget ; rdfs:range xsd:string .
 gad:bodyMaterial a owl:DatatypeProperty ; rdfs:domain gad:Gadget ; rdfs:range xsd:string .
 
-# Technical Specs
 gad:ramSize a owl:DatatypeProperty ; rdfs:domain gad:RAM ; rdfs:range xsd:integer .
-gad:ramTechnology a owl:DatatypeProperty ; rdfs:domain gad:RAM ; rdfs:range xsd:string . # e.g. LPDDR5X
+gad:ramTechnology a owl:DatatypeProperty ; rdfs:domain gad:RAM ; rdfs:range xsd:string .
 gad:storageSizeGB a owl:DatatypeProperty ; rdfs:domain gad:Storage ; rdfs:range xsd:integer .
-gad:storageTechnology a owl:DatatypeProperty ; rdfs:domain gad:Storage ; rdfs:range xsd:string . # e.g. UFS 4.0
+gad:storageTechnology a owl:DatatypeProperty ; rdfs:domain gad:Storage ; rdfs:range xsd:string .
 gad:vramSize a owl:DatatypeProperty ; rdfs:domain gad:GPU ; rdfs:range xsd:integer .
 gad:supportsCUDA a owl:DatatypeProperty ; rdfs:range xsd:boolean .
 gad:supportsNPU a owl:DatatypeProperty ; rdfs:range xsd:boolean .
+gad:cpuModelName a owl:DatatypeProperty ; rdfs:domain gad:CPU ; rdfs:range xsd:string .
+gad:socModelName a owl:DatatypeProperty ; rdfs:domain gad:SoC ; rdfs:range xsd:string .
 
-# Display & Camera
 gad:displayPanel a owl:DatatypeProperty ; rdfs:domain gad:Display ; rdfs:range xsd:string .
 gad:refreshRateHz a owl:DatatypeProperty ; rdfs:domain gad:Display ; rdfs:range xsd:integer .
 gad:cameraMegapixel a owl:DatatypeProperty ; rdfs:range xsd:integer .
 gad:video4k60 a owl:DatatypeProperty ; rdfs:range xsd:boolean .
+gad:hasOIS a owl:DatatypeProperty ; rdfs:range xsd:boolean .
 gad:ibis a owl:DatatypeProperty ; rdfs:range xsd:boolean .
 
-# Battery & Power
 gad:batteryCapacitymAh a owl:DatatypeProperty ; rdfs:domain gad:Battery ; rdfs:range xsd:integer .
 gad:batteryCapacityWh a owl:DatatypeProperty ; rdfs:domain gad:Battery ; rdfs:range xsd:decimal .
 gad:maxFlightTimeMin a owl:DatatypeProperty ; rdfs:range xsd:integer .
 
 #################################################################
-# Individuals (Workloads & Brands)
+# Individuals: Workloads & Brands
 #################################################################
 
 gad:Training_Model_AI a gad:Workload .
@@ -118,317 +177,313 @@ gad:Gaming_1440p a gad:Workload .
 gad:Wrist_Health_Tracking a gad:Workload .
 gad:Premium_Device_Status a gad:Workload .
 
-gad:Apple a gad:Brand . gad:Samsung a gad:Brand . gad:Sony a gad:Brand . 
-gad:Asus a gad:Brand . gad:HP a gad:Brand . gad:Google a gad:Brand . 
+gad:Apple a gad:Brand . gad:Samsung a gad:Brand . gad:Sony a gad:Brand .
+gad:Asus a gad:Brand . gad:HP a gad:Brand . gad:Google a gad:Brand .
 gad:Microsoft a gad:Brand . gad:Xiaomi a gad:Brand . gad:Canon a gad:Brand .
-gad:Lenovo a gad:Brand . gad:MSI a gad:Brand . gad:Razer a gad:Brand . 
-gad:Acer a gad:Brand . gad:OnePlus a gad:Brand . gad:Oppo a gad:Brand . 
-gad:Vivo a gad:Brand . gad:Huawei a gad:Brand . gad:Honor a gad:Brand . 
-gad:Nikon a gad:Brand . gad:Fujifilm a gad:Brand . gad:Panasonic a gad:Brand . 
-gad:DJI a gad:Brand . gad:Autel a gad:Brand . gad:Garmin a gad:Brand . 
-gad:Suunto a gad:Brand . gad:Bose a gad:Brand . gad:Sennheiser a gad:Brand . 
-gad:Nothing a gad:Brand .
+gad:Lenovo a gad:Brand . gad:MSI a gad:Brand . gad:Razer a gad:Brand .
+gad:Acer a gad:Brand . gad:OnePlus a gad:Brand . gad:Oppo a gad:Brand .
+gad:Vivo a gad:Brand . gad:Huawei a gad:Brand . gad:Honor a gad:Brand .
+gad:Nikon a gad:Brand . gad:Fujifilm a gad:Brand . gad:Panasonic a gad:Brand .
+gad:DJI a gad:Brand . gad:Autel a gad:Brand . gad:Garmin a gad:Brand .
+gad:Suunto a gad:Brand . gad:Bose a gad:Brand . gad:Sennheiser a gad:Brand .
+gad:Nothing a gad:Brand . gad:Axioo a gad:Brand . gad:Zyrex a gad:Brand .
+gad:Itel a gad:Brand . gad:Infinix a gad:Brand . gad:Tecno a gad:Brand .
+gad:Realme a gad:Brand . gad:Insta360 a gad:Brand . gad:Ricoh a gad:Brand .
+gad:Leica a gad:Brand . gad:Fimi a gad:Brand . gad:Coros a gad:Brand .
+gad:Amazfit a gad:Brand . gad:Moondrop a gad:Brand . gad:Eggel a gad:Brand .
+gad:GoPro a gad:Brand . gad:Dell a gad:Brand .
 
 #################################################################
-# 40 GADGETS - ULTRA DETAILED REAL SPECS
+# GADGETS 1-90
 #################################################################
 
-# 1. MacBook Pro 14 M3 Max
 gad:MacBook_Pro_14_M3_Max a gad:Laptop ;
   gad:hasBrand gad:Apple ;
   gad:hasComponent gad:M3_Max_SoC, gad:RAM_64GB_Unified, gad:SSD_1TB_Gen4, gad:Batt_70Wh, gad:Display_LiquidRetinaXDR ;
   gad:priceIDR 55999000 ;
+  gad:releaseYear 2023 ;
   gad:osName "macOS Sonoma" ;
   gad:availableColor "Space Black", "Silver" ;
   gad:keyFeature "Thunderbolt 4", "MagSafe 3", "Hardware Ray Tracing" ;
-  gad:bodyMaterial "Recycled Aluminum" ;
   gad:weightGr 1620 .
 
-# 2. Samsung Galaxy S24 Ultra
 gad:S24_Ultra a gad:Smartphone ;
   gad:hasBrand gad:Samsung ;
   gad:hasComponent gad:Snapdragon_8_Gen_3, gad:RAM_12GB_LPDDR5X, gad:Batt_5000, gad:Display_Dynamic_AMOLED_2X ;
   gad:priceIDR 21999000 ;
+  gad:releaseYear 2024 ;
   gad:osName "Android 14 (One UI 6.1)" ;
   gad:availableColor "Titanium Gray", "Titanium Black", "Titanium Violet" ;
   gad:keyFeature "S Pen Integrated", "Galaxy AI", "Gorilla Armor" ;
-  gad:bodyMaterial "Titanium Frame" ;
   gad:weightGr 232 .
 
-# 3. iPhone 15 Pro Max
 gad:iPhone_15_Pro_Max a gad:Smartphone ;
   gad:hasBrand gad:Apple ;
   gad:hasComponent gad:A17_Pro_SoC, gad:RAM_8GB_LPDDR5, gad:Batt_4441 ;
   gad:priceIDR 24999000 ;
+  gad:releaseYear 2023 ;
   gad:osName "iOS 17" ;
   gad:availableColor "Natural Titanium", "Blue Titanium", "White Titanium" ;
   gad:keyFeature "Action Button", "USB-C 3.0", "Log Video Recording" ;
-  gad:bodyMaterial "Grade 5 Titanium" ;
   gad:weightGr 221 .
 
-# 4. Sony A7 IV
 gad:Sony_A7_IV a gad:Mirrorless ;
   gad:hasBrand gad:Sony ;
   gad:hasComponent gad:Sensor_FullFrame_33MP ;
   gad:priceIDR 36999000 ;
+  gad:releaseYear 2021 ;
   gad:availableColor "Black" ;
   gad:keyFeature "Real-time Eye AF", "S-Cinetone", "Vari-angle LCD" ;
-  gad:bodyMaterial "Magnesium Alloy" ;
   gad:weightGr 658 .
 
-# 5. DJI Mavic 3 Pro
 gad:DJI_Mavic_3_Pro a gad:Drone ;
   gad:hasBrand gad:DJI ;
   gad:hasComponent gad:Hasselblad_Triple_Cam, gad:Batt_Drone_77Wh ;
   gad:priceIDR 34000000 ;
+  gad:releaseYear 2023 ;
   gad:maxFlightTimeMin 43 ;
   gad:keyFeature "Omnidirectional Obstacle Sensing", "Apple ProRes 422" ;
   gad:weightGr 958 .
 
-# 6. ASUS ROG Zephyrus G16 (2024)
 gad:ROG_Zephyrus_G16_2024 a gad:Laptop ;
   gad:hasBrand gad:Asus ;
   gad:hasComponent gad:Core_Ultra_9, gad:RTX_4090_Laptop, gad:RAM_32GB_LPDDR5X, gad:Batt_90Wh, gad:Display_OLED_240Hz ;
   gad:priceIDR 45999000 ;
+  gad:releaseYear 2024 ;
   gad:osName "Windows 11 Home" ;
   gad:availableColor "Eclipse Gray", "Platinum White" ;
   gad:keyFeature "Slash Lighting", "G-SYNC", "MUX Switch" ;
-  gad:bodyMaterial "CNC Aluminum" ;
   gad:weightGr 1850 .
 
-# 7. Google Pixel 8 Pro
 gad:Pixel_8_Pro a gad:Smartphone ;
   gad:hasBrand gad:Google ;
   gad:hasComponent gad:Tensor_G3_SoC, gad:RAM_12GB_LPDDR5X, gad:Batt_5050 ;
   gad:priceIDR 17500000 ;
+  gad:releaseYear 2023 ;
   gad:osName "Android 14" ;
   gad:availableColor "Bay", "Obsidian", "Porcelain" ;
   gad:keyFeature "Google AI Magic Eraser", "Best Take", "Temperature Sensor" ;
   gad:weightGr 213 .
 
-# 8. Apple Watch Ultra 2
 gad:Apple_Watch_Ultra_2 a gad:Smartwatch ;
   gad:hasBrand gad:Apple ;
   gad:hasComponent gad:S9_SiP_Chip, gad:HealthSensor_Advanced ;
   gad:priceIDR 13999000 ;
+  gad:releaseYear 2023 ;
   gad:osName "watchOS 10" ;
   gad:availableColor "Natural Titanium" ;
   gad:keyFeature "Double Tap Gesture", "Siren", "Precision Finding" ;
-  gad:bodyMaterial "Titanium" ;
   gad:weightGr 61 .
 
-# 9. HP Spectre x360 14 (2024)
 gad:HP_Spectre_x360_2024 a gad:Laptop ;
   gad:hasBrand gad:HP ;
   gad:hasComponent gad:Core_Ultra_7, gad:RAM_16GB_LPDDR5X, gad:Batt_68Wh, gad:Display_OLED_Touch ;
   gad:priceIDR 26999000 ;
+  gad:releaseYear 2024 ;
   gad:keyFeature "360 Hinge", "Haptic Touchpad", "IMAX Enhanced" ;
-  gad:availableColor "Nightfall Black", "Slate Blue" ;
   gad:weightGr 1440 .
 
-# 10. Sony ZV-E1
 gad:Sony_ZV_E1 a gad:Mirrorless ;
   gad:hasBrand gad:Sony ;
   gad:hasComponent gad:Sensor_FullFrame_12MP, gad:AI_Processing_Unit ;
   gad:priceIDR 31999000 ;
+  gad:releaseYear 2023 ;
   gad:availableColor "Black", "White" ;
   gad:keyFeature "AI Auto Framing", "Product Showcase Setting" ;
   gad:weightGr 483 .
 
-# 11. Dell XPS 16 (2024)
 gad:Dell_XPS_16 a gad:Laptop ;
   gad:hasBrand gad:Dell ;
   gad:hasComponent gad:Core_Ultra_7, gad:RTX_4060_Laptop, gad:RAM_32GB_LPDDR5X, gad:Batt_99Wh ;
   gad:priceIDR 42999000 ;
+  gad:releaseYear 2024 ;
   gad:keyFeature "Invisible Haptic Touchpad", "Touch Function Row" ;
-  gad:bodyMaterial "CNC Machined Aluminum" ;
   gad:weightGr 2130 .
 
-# 12. Xiaomi 14 Ultra
 gad:Xiaomi_14_Ultra a gad:Smartphone ;
   gad:hasBrand gad:Xiaomi ;
   gad:hasComponent gad:Snapdragon_8_Gen_3, gad:RAM_16GB_LPDDR5X, gad:Cam_Quad_Leica, gad:Batt_5000 ;
   gad:priceIDR 18999000 ;
+  gad:releaseYear 2024 ;
   gad:availableColor "Black", "White" ;
   gad:keyFeature "Leica Summilux Lens", "Stepless Variable Aperture" ;
   gad:weightGr 220 .
 
-# 13. Microsoft Surface Pro 9
 gad:Surface_Pro_9 a gad:Laptop ;
   gad:hasBrand gad:Microsoft ;
   gad:hasComponent gad:Core_i7_12th, gad:RAM_16GB_LPDDR5, gad:Batt_47Wh, gad:Display_PixelSense_Flow ;
   gad:priceIDR 21500000 ;
+  gad:releaseYear 2022 ;
   gad:keyFeature "Detachable Keyboard", "Built-in Kickstand", "Thunderbolt 4" ;
   gad:weightGr 879 .
 
-# 14. DJI Avata 2
 gad:DJI_Avata_2 a gad:Drone ;
   gad:hasBrand gad:DJI ;
   gad:hasComponent gad:FPV_Camera_4K, gad:Batt_Drone_31Wh ;
   gad:priceIDR 14500000 ;
+  gad:releaseYear 2024 ;
   gad:maxFlightTimeMin 23 ;
   gad:keyFeature "FPV Experience", "Motion Controller Support" ;
   gad:weightGr 377 .
 
-# 15. Canon EOS R5
 gad:Canon_EOS_R5 a gad:Mirrorless ;
   gad:hasBrand gad:Canon ;
   gad:hasComponent gad:Sensor_FullFrame_45MP ;
   gad:priceIDR 54000000 ;
+  gad:releaseYear 2020 ;
   gad:keyFeature "8K RAW Video", "Dual Pixel CMOS AF II" ;
   gad:weightGr 738 .
 
-# 16. Samsung Galaxy Z Fold 5
 gad:Galaxy_Z_Fold_5 a gad:Smartphone ;
   gad:hasBrand gad:Samsung ;
   gad:hasComponent gad:Snapdragon_8_Gen_2, gad:RAM_12GB_LPDDR5X, gad:Batt_4400 ;
   gad:priceIDR 24999000 ;
+  gad:releaseYear 2023 ;
   gad:availableColor "Icy Blue", "Phantom Black" ;
   gad:keyFeature "Foldable Dynamic AMOLED", "Flex Mode", "IPX8" ;
   gad:weightGr 253 .
 
-# 17. MacBook Air 13 M3
 gad:MacBook_Air_M3 a gad:Laptop ;
   gad:hasBrand gad:Apple ;
   gad:hasComponent gad:M3_SoC, gad:RAM_16GB_Unified, gad:Batt_52Wh, gad:Display_LiquidRetina ;
   gad:priceIDR 19999000 ;
+  gad:releaseYear 2024 ;
   gad:keyFeature "Fanless Design", "MagSafe 3" ;
   gad:weightGr 1240 .
 
-# 18. Sony WH-1000XM5
 gad:Sony_WH1000XM5 a gad:AudioDevice ;
   gad:hasBrand gad:Sony ;
   gad:hasComponent gad:V1_Processor_Audio ;
   gad:priceIDR 4999000 ;
+  gad:releaseYear 2022 ;
   gad:availableColor "Black", "Silver" ;
   gad:keyFeature "Industry Leading Noise Canceling", "Speak-to-Chat" ;
   gad:weightGr 250 .
 
-# 19. Samsung Galaxy Watch 6 Classic
 gad:Galaxy_Watch_6_Classic a gad:Smartwatch ;
   gad:hasBrand gad:Samsung ;
   gad:hasComponent gad:Exynos_W930, gad:HealthSensor_Samsung, gad:Batt_425 ;
   gad:priceIDR 4499000 ;
+  gad:releaseYear 2023 ;
   gad:keyFeature "Rotating Bezel", "Body Composition Analysis" ;
   gad:weightGr 59 .
 
-# 20. GoPro Hero 12 Black
 gad:GoPro_Hero_12 a gad:AudioDevice ;
   gad:hasBrand gad:GoPro ;
   gad:hasComponent gad:GP2_Processor, gad:Batt_1720 ;
   gad:priceIDR 6500000 ;
+  gad:releaseYear 2023 ;
   gad:keyFeature "HyperSmooth 6.0", "Waterproof 10m" ;
   gad:weightGr 154 .
 
-# 21. Lenovo Legion 9i
 gad:Lenovo_Legion_9i a gad:Laptop ;
   gad:hasBrand gad:Lenovo ;
   gad:hasComponent gad:Core_i9_14900HX, gad:RTX_4090_Laptop, gad:RAM_64GB_DDR5, gad:Batt_99Wh, gad:Display_MiniLED_3K ;
   gad:priceIDR 68999000 ;
+  gad:releaseYear 2024 ;
   gad:availableColor "Carbon Black" ;
   gad:keyFeature "Liquid Cooling System", "Forged Carbon Cover", "AI Tuning" ;
   gad:weightGr 2560 .
 
-# 22. MSI Titan 18 HX
 gad:MSI_Titan_18_HX a gad:Laptop ;
   gad:hasBrand gad:MSI ;
   gad:hasComponent gad:Core_i9_14900HX, gad:RTX_4090_Laptop, gad:RAM_128GB_DDR5, gad:Batt_99Wh, gad:Display_MiniLED_4K ;
   gad:priceIDR 75000000 ;
+  gad:releaseYear 2024 ;
   gad:keyFeature "Cherry MX Mechanical Keyboard", "Vapor Chamber Cooling" ;
   gad:weightGr 3600 .
 
-# 23. Razer Blade 16
 gad:Razer_Blade_16 a gad:Laptop ;
   gad:hasBrand gad:Razer ;
   gad:hasComponent gad:Core_i9_14900HX, gad:RTX_4080_Laptop, gad:RAM_32GB_DDR5, gad:Batt_95Wh, gad:Display_OLED_240Hz ;
   gad:priceIDR 52000000 ;
+  gad:releaseYear 2024 ;
   gad:availableColor "Black", "Mercury" ;
   gad:keyFeature "Unibody Aluminum", "GaN Charger" ;
   gad:weightGr 2450 .
 
-# 24. Acer Predator Helios 18
 gad:Acer_Predator_Helios_18 a gad:Laptop ;
   gad:hasBrand gad:Acer ;
   gad:hasComponent gad:Core_i9_14900HX, gad:RTX_4080_Laptop, gad:RAM_32GB_DDR5, gad:Batt_90Wh ;
   gad:priceIDR 39999000 ;
+  gad:releaseYear 2024 ;
   gad:keyFeature "MagKey 3.0", "AeroBlade 3D Fan", "Wi-Fi 7" ;
   gad:weightGr 3250 .
 
-# 25. Lenovo ThinkPad X1 Carbon Gen 12
 gad:ThinkPad_X1_Carbon a gad:Laptop ;
   gad:hasBrand gad:Lenovo ;
   gad:hasComponent gad:Core_Ultra_7, gad:RAM_32GB_LPDDR5X, gad:Batt_57Wh ;
   gad:priceIDR 34000000 ;
+  gad:releaseYear 2024 ;
   gad:keyFeature "Communication Bar", "Carbon Fiber Chassis", "Dolby Voice" ;
   gad:weightGr 1090 .
 
-# 26. OnePlus 12
 gad:OnePlus_12 a gad:Smartphone ;
   gad:hasBrand gad:OnePlus ;
   gad:hasComponent gad:Snapdragon_8_Gen_3, gad:RAM_16GB_LPDDR5X, gad:Batt_5400 ;
   gad:priceIDR 14000000 ;
+  gad:releaseYear 2024 ;
   gad:availableColor "Flowy Emerald", "Silky Black" ;
   gad:keyFeature "Hasselblad Camera for Mobile", "100W SuperVOOC" ;
   gad:weightGr 220 .
 
-# 27. Oppo Find X7 Ultra
 gad:Oppo_Find_X7_Ultra a gad:Smartphone ;
   gad:hasBrand gad:Oppo ;
   gad:hasComponent gad:Snapdragon_8_Gen_3, gad:RAM_16GB_LPDDR5X, gad:Cam_Quad_Periscope, gad:Batt_5000 ;
   gad:priceIDR 18500000 ;
+  gad:releaseYear 2024 ;
   gad:keyFeature "Dual Periscope Telephoto", "HyperTone Image Engine" ;
   gad:weightGr 221 .
 
-# 28. Vivo X100 Pro
 gad:Vivo_X100_Pro a gad:Smartphone ;
   gad:hasBrand gad:Vivo ;
   gad:hasComponent gad:Dimensity_9300, gad:RAM_16GB_LPDDR5X, gad:Batt_5400, gad:Cam_Zeiss_APO ;
   gad:priceIDR 16999000 ;
+  gad:releaseYear 2023 ;
   gad:keyFeature "Zeiss APO Floating Telephoto", "V3 Chip", "100W FlashCharge" ;
   gad:weightGr 225 .
 
-# 29. Huawei Pura 70 Ultra
 gad:Huawei_Pura_70_Ultra a gad:Smartphone ;
   gad:hasBrand gad:Huawei ;
   gad:hasComponent gad:Kirin_9010, gad:RAM_16GB_LPDDR5X, gad:Cam_PopUp_Retractable, gad:Batt_5200 ;
   gad:priceIDR 21000000 ;
+  gad:releaseYear 2024 ;
   gad:keyFeature "Retractable Camera Lens", "Crystal Armor Kunlun Glass" ;
   gad:weightGr 226 .
 
-# 30. Honor Magic6 Pro
 gad:Honor_Magic6_Pro a gad:Smartphone ;
   gad:hasBrand gad:Honor ;
   gad:hasComponent gad:Snapdragon_8_Gen_3, gad:RAM_12GB_LPDDR5X, gad:Batt_5600 ;
   gad:priceIDR 17000000 ;
+  gad:releaseYear 2024 ;
   gad:keyFeature "Silicon-Carbon Battery", "Falcon Camera System" ;
   gad:weightGr 229 .
 
-# 31. Nikon Z8
 gad:Nikon_Z8 a gad:Mirrorless ;
   gad:hasBrand gad:Nikon ;
   gad:hasComponent gad:Sensor_FullFrame_45MP ;
   gad:priceIDR 59000000 ;
+  gad:releaseYear 2023 ;
   gad:keyFeature "8K60 Video", "Subject Detection AI", "Real-Live Viewfinder" ;
   gad:weightGr 910 .
 
-# 32. Fujifilm X-T5
 gad:Fujifilm_X_T5 a gad:Mirrorless ;
   gad:hasBrand gad:Fujifilm ;
   gad:hasComponent gad:Sensor_APS_C_40MP ;
   gad:priceIDR 27999000 ;
+  gad:releaseYear 2022 ;
   gad:availableColor "Black", "Silver" ;
   gad:keyFeature "Film Simulation", "5-Axis IBIS", "Classic Dial Design" ;
   gad:weightGr 557 .
 
-# 33. Panasonic Lumix S5II
 gad:Panasonic_Lumix_S5II a gad:Mirrorless ;
   gad:hasBrand gad:Panasonic ;
   gad:hasComponent gad:Sensor_FullFrame_24MP ;
   gad:priceIDR 29999000 ;
+  gad:releaseYear 2023 ;
   gad:keyFeature "Phase Hybrid AF", "Active I.S.", "Real-time LUT" ;
   gad:weightGr 740 .
 
-# 34. DJI Air 3
 gad:DJI_Air_3 a gad:Drone ;
   gad:hasBrand gad:DJI ;
   gad:hasComponent gad:Dual_Cam_4K, gad:Batt_Drone_62Wh ;
@@ -437,7 +492,6 @@ gad:DJI_Air_3 a gad:Drone ;
   gad:keyFeature "Dual-Camera System", "O4 Video Transmission" ;
   gad:weightGr 720 .
 
-# 35. Autel EVO Lite+
 gad:Autel_Evo_Lite_Plus a gad:Drone ;
   gad:hasBrand gad:Autel ;
   gad:hasComponent gad:Sensor_1inch_4K ;
@@ -446,148 +500,518 @@ gad:Autel_Evo_Lite_Plus a gad:Drone ;
   gad:keyFeature "Moonlight Algorithm", "Defog Mode" ;
   gad:weightGr 835 .
 
-# 36. Garmin Fenix 7 Pro
 gad:Garmin_Fenix_7_Pro a gad:Smartwatch ;
   gad:hasBrand gad:Garmin ;
   gad:hasComponent gad:HealthSensor_Garmin_Elevate ;
   gad:priceIDR 16500000 ;
+  gad:releaseYear 2023 ;
   gad:keyFeature "Solar Charging", "Built-in Flashlight", "Endurance Score" ;
   gad:weightGr 79 .
 
-# 37. Suunto Race
 gad:Suunto_Race a gad:Smartwatch ;
   gad:hasBrand gad:Suunto ;
   gad:hasComponent gad:HealthSensor_Generic ;
   gad:priceIDR 8000000 ;
+  gad:releaseYear 2023 ;
   gad:keyFeature "AMOLED Display", "HRV Recovery", "Offline Maps" ;
   gad:weightGr 65 .
 
-# 38. Bose QuietComfort Ultra Headphones
 gad:Bose_QC_Ultra a gad:AudioDevice ;
   gad:hasBrand gad:Bose ;
   gad:hasComponent gad:Chip_Bose_Custom ;
   gad:priceIDR 6999000 ;
+  gad:releaseYear 2023 ;
   gad:keyFeature "Immersive Audio", "CustomTune", "24 Hours Battery" ;
   gad:weightGr 250 .
 
-# 39. Sennheiser Momentum 4
 gad:Sennheiser_Momentum_4 a gad:AudioDevice ;
   gad:hasBrand gad:Sennheiser ;
   gad:hasComponent gad:Chip_Sennheiser_Custom ;
   gad:priceIDR 5500000 ;
+  gad:releaseYear 2022 ;
   gad:keyFeature "60 Hours Battery", "Audiophile Sound", "Adaptive Noise Cancellation" ;
   gad:weightGr 293 .
 
-# 40. Nothing Phone (2)
 gad:Nothing_Phone_2 a gad:Smartphone ;
   gad:hasBrand gad:Nothing ;
   gad:hasComponent gad:Snapdragon_8_Plus_Gen_1, gad:RAM_12GB_LPDDR5, gad:Batt_4700 ;
   gad:priceIDR 10999000 ;
+  gad:releaseYear 2023 ;
   gad:availableColor "Dark Grey", "White" ;
   gad:keyFeature "Glyph Interface", "Nothing OS 2.0", "Transparent Back Design" ;
   gad:weightGr 201 .
 
+gad:Lenovo_Yoga_9i_2in1 a gad:Laptop ;
+  gad:hasBrand gad:Lenovo ;
+  gad:hasComponent gad:Core_Ultra_7, gad:RAM_16GB_LPDDR5X, gad:SSD_1TB_Gen4, gad:Display_OLED_4K, gad:Batt_75Wh ;
+  gad:priceIDR 29999000 ;
+  gad:releaseYear 2024 ;
+  gad:osName "Windows 11 Home" ;
+  gad:availableColor "Cosmic Blue", "Luna Grey" ;
+  gad:keyFeature "360 Hinge", "Bowers & Wilkins Sound", "Slim Pen Included" ;
+  gad:weightGr 1350 .
+
+gad:HP_Omen_Transcend_14 a gad:Laptop ;
+  gad:hasBrand gad:HP ;
+  gad:hasComponent gad:Core_Ultra_7, gad:RTX_4060_Laptop, gad:RAM_16GB_LPDDR5X, gad:SSD_1TB_Gen4, gad:Display_OLED_2_8K ;
+  gad:priceIDR 34999000 ;
+  gad:releaseYear 2024 ;
+  gad:osName "Windows 11 Home" ;
+  gad:availableColor "Ceramic White", "Shadow Black" ;
+  gad:keyFeature "HyperX Audio", "Tempest Cooling", "Compact Gaming" ;
+  gad:weightGr 1630 .
+
+gad:MSI_Cyborg_15 a gad:Laptop ;
+  gad:hasBrand gad:MSI ;
+  gad:hasComponent gad:Core_i5_12450H, gad:RTX_4050_Laptop, gad:RAM_16GB_DDR5, gad:SSD_512GB_Gen4, gad:Batt_53Wh ;
+  gad:priceIDR 12499000 ;
+  gad:releaseYear 2023 ;
+  gad:osName "Windows 11 Home" ;
+  gad:availableColor "Translucent Black" ;
+  gad:keyFeature "Translucent Chassis", "Blue Backlit Keyboard", "Budget Gaming" ;
+  gad:weightGr 1980 .
+
+gad:Acer_Swift_Go_14_AI a gad:Laptop ;
+  gad:hasBrand gad:Acer ;
+  gad:hasComponent gad:Core_Ultra_5, gad:RAM_16GB_LPDDR5X, gad:SSD_512GB_Gen4, gad:Display_OLED_2_8K, gad:Batt_65Wh ;
+  gad:priceIDR 13999000 ;
+  gad:releaseYear 2024 ;
+  gad:osName "Windows 11 Home" ;
+  gad:availableColor "Pure Silver" ;
+  gad:keyFeature "AI Boost", "QHD Webcam", "TwinAir Cooling" ;
+  gad:weightGr 1320 .
+
+gad:Razer_Blade_14_2024 a gad:Laptop ;
+  gad:hasBrand gad:Razer ;
+  gad:hasComponent gad:Ryzen_9_8945HS, gad:RTX_4070_Laptop, gad:RAM_32GB_DDR5, gad:SSD_1TB_Gen4, gad:Display_QHD_240Hz ;
+  gad:priceIDR 39999000 ;
+  gad:releaseYear 2024 ;
+  gad:osName "Windows 11 Home" ;
+  gad:availableColor "Mercury", "Matte Black" ;
+  gad:keyFeature "Vapor Chamber", "THX Spatial Audio", "CNC Aluminum" ;
+  gad:weightGr 1840 .
+
+gad:Axioo_Pongo_760 a gad:Laptop ;
+  gad:hasBrand gad:Axioo ;
+  gad:hasComponent gad:Core_i7_13620H, gad:RTX_4060_Laptop, gad:RAM_16GB_DDR4, gad:SSD_512GB_Gen4, gad:Batt_57Wh ;
+  gad:priceIDR 15999000 ;
+  gad:releaseYear 2024 ;
+  gad:osName "Windows 11 Pro" ;
+  gad:keyFeature "100% sRGB Screen", "Best Value RTX 4060", "Local Warranty" ;
+  gad:weightGr 2050 .
+
+gad:Advan_Pixelwar a gad:Laptop ;
+  gad:hasBrand gad:Lenovo ; 
+  gad:hasComponent gad:Ryzen_5_6600H, gad:RX_6500M, gad:RAM_16GB_LPDDR5, gad:SSD_512GB_Gen3, gad:Display_2_5K_IPS ;
+  gad:priceIDR 10999000 ;
+  gad:releaseYear 2023 ;
+  gad:osName "Windows 11 Home" ;
+  gad:keyFeature "16:10 Aspect Ratio", "Metal Casing", "Budget Creator" ;
+  gad:weightGr 1900 .
+
+gad:Surface_Laptop_6 a gad:Laptop ;
+  gad:hasBrand gad:Microsoft ;
+  gad:hasComponent gad:Core_Ultra_5, gad:RAM_16GB_LPDDR5X, gad:SSD_512GB_Gen4, gad:Display_PixelSense_Touch ;
+  gad:priceIDR 24500000 ;
+  gad:releaseYear 2024 ;
+  gad:osName "Windows 11 Pro" ;
+  gad:keyFeature "Anti-Reflective Screen", "Surface Pen Support", "Enterprise Security" ;
+  gad:weightGr 1380 .
+
+gad:Asus_Zenbook_Duo_2024 a gad:Laptop ;
+  gad:hasBrand gad:Asus ;
+  gad:hasComponent gad:Core_Ultra_7, gad:RAM_32GB_LPDDR5X, gad:SSD_1TB_Gen4, gad:Display_Dual_OLED_3K, gad:Batt_75Wh ;
+  gad:priceIDR 34999000 ;
+  gad:releaseYear 2024 ;
+  gad:osName "Windows 11 Home" ;
+  gad:keyFeature "Dual Screen OLED", "Detachable Keyboard", "Built-in Kickstand" ;
+  gad:weightGr 1650 .
+
+gad:Zyrex_Kintamani a gad:Laptop ;
+  gad:hasBrand gad:Zyrex ;
+  gad:hasComponent gad:Ryzen_7_5700U, gad:RAM_16GB_DDR4, gad:SSD_512GB_Gen3 ;
+  gad:priceIDR 8999000 ;
+  gad:releaseYear 2023 ;
+  gad:osName "Windows 11 Home" ;
+  gad:keyFeature "Local Brand", "AMD Radeon Graphics", "Slim Design" ;
+  gad:weightGr 1400 .
+
+gad:Galaxy_A55 a gad:Smartphone ;
+  gad:hasBrand gad:Samsung ;
+  gad:hasComponent gad:Exynos_1480, gad:RAM_12GB, gad:Batt_5000, gad:Cam_50MP_Samsung ;
+  gad:priceIDR 6499000 ;
+  gad:releaseYear 2024 ;
+  gad:osName "Android 14 (One UI)" ;
+  gad:keyFeature "Metal Frame", "Knox Vault", "IP67", "Awesome Colors" ;
+  gad:weightGr 213 .
+
+gad:Galaxy_A35 a gad:Smartphone ;
+  gad:hasBrand gad:Samsung ;
+  gad:hasComponent gad:Exynos_1380, gad:RAM_8GB, gad:Batt_5000 ;
+  gad:priceIDR 4999000 ;
+  gad:releaseYear 2024 ;
+  gad:weightGr 209 .
+
+gad:Redmi_Note_13_Pro_Plus a gad:Smartphone ;
+  gad:hasBrand gad:Xiaomi ;
+  gad:hasComponent gad:Dimensity_7200_Ultra, gad:RAM_12GB, gad:Batt_5000, gad:Cam_200MP_Samsung ;
+  gad:priceIDR 5999000 ;
+  gad:releaseYear 2024 ;
+  gad:keyFeature "IP68 Water Resist", "120W HyperCharge", "Curved Screen" ;
+  gad:weightGr 204 .
+
+gad:POCO_F6 a gad:Smartphone ;
+  gad:hasBrand gad:Xiaomi ;
+  gad:hasComponent gad:Snapdragon_8s_Gen_3, gad:RAM_12GB_LPDDR5X, gad:Batt_5000 ;
+  gad:priceIDR 5699000 ;
+  gad:releaseYear 2024 ;
+  gad:keyFeature "Flagship Killer", "90W Turbo Charging", "WildBoost 3.0" ;
+  gad:weightGr 179 .
+
+gad:POCO_X6_Pro a gad:Smartphone ;
+  gad:hasBrand gad:Xiaomi ;
+  gad:hasComponent gad:Dimensity_8300_Ultra, gad:RAM_12GB, gad:Batt_5000 ;
+  gad:priceIDR 4499000 ;
+  gad:releaseYear 2024 ;
+  gad:osName "HyperOS" ;
+  gad:keyFeature "AnTuTu 1.4 Million", "CrystalRes AMOLED", "Gaming Performance" .
+
+gad:Infinix_GT_20_Pro a gad:Smartphone ;
+  gad:hasBrand gad:Infinix ;
+  gad:hasComponent gad:Dimensity_8200_Ult, gad:RAM_12GB, gad:Batt_5000 ;
+  gad:priceIDR 4699000 ;
+  gad:releaseYear 2024 ;
+  gad:keyFeature "Mecha Design", "RGB Loop Lighting", "Dedicated Gaming Chip", "144Hz" ;
+  gad:weightGr 194 .
+
+gad:Tecno_Pova_6_Pro a gad:Smartphone ;
+  gad:hasBrand gad:Tecno ;
+  gad:hasComponent gad:Dimensity_6080, gad:RAM_12GB, gad:Batt_6000 ;
+  gad:priceIDR 3299000 ;
+  gad:releaseYear 2024 ;
+  gad:keyFeature "6000mAh Battery", "Dynamic Light Effect", "70W Charging" ;
+  gad:weightGr 198 .
+
+gad:Itel_RS4 a gad:Smartphone ;
+  gad:hasBrand gad:Itel ;
+  gad:hasComponent gad:Helio_G99_Ult, gad:RAM_12GB, gad:Batt_5000 ;
+  gad:priceIDR 1899000 ;
+  gad:releaseYear 2024 ;
+  gad:keyFeature "Budget Gaming", "45W Charging", "Racing Design" ;
+  gad:weightGr 198 .
+
+gad:Realme_12_Plus a gad:Smartphone ;
+  gad:hasBrand gad:Realme ;
+  gad:hasComponent gad:Dimensity_7050, gad:RAM_8GB, gad:Batt_5000, gad:Cam_50MP_SonyLYT ;
+  gad:priceIDR 3999000 ;
+  gad:releaseYear 2024 ;
+  gad:keyFeature "Luxury Watch Design", "Sony LYT-600 OIS", "Rainwater Touch" .
+
+gad:Vivo_V30e a gad:Smartphone ;
+  gad:hasBrand gad:Vivo ;
+  gad:hasComponent gad:Snapdragon_6_Gen_1, gad:RAM_8GB, gad:Batt_5500, gad:Cam_50MP_SonyIMX882 ;
+  gad:priceIDR 4699000 ;
+  gad:releaseYear 2024 ;
+  gad:keyFeature "Aura Light Portrait", "3D Curved Screen", "Slim 5500mAh" .
+
+gad:Oppo_Reno_11_F a gad:Smartphone ;
+  gad:hasBrand gad:Oppo ;
+  gad:hasComponent gad:Dimensity_7050, gad:RAM_8GB, gad:Batt_5000 ;
+  gad:priceIDR 4399000 ;
+  gad:releaseYear 2024 ;
+  gad:keyFeature "Magnetic Particle Design", "IP65", "67W SuperVOOC" .
+
+gad:iPhone_13 a gad:Smartphone ;
+  gad:hasBrand gad:Apple ;
+  gad:hasComponent gad:A15_Bionic, gad:RAM_4GB, gad:Batt_3240 ;
+  gad:priceIDR 10249000 ;
+  gad:releaseYear 2021 ;
+  gad:osName "iOS 17" ;
+  gad:keyFeature "Ceramic Shield", "Cinematic Mode", "Compact Flagship" ;
+  gad:weightGr 174 .
+
+gad:Asus_Zenfone_10 a gad:Smartphone ;
+  gad:hasBrand gad:Asus ;
+  gad:hasComponent gad:Snapdragon_8_Gen_2, gad:RAM_8GB, gad:Batt_4300 ;
+  gad:priceIDR 10999000 ;
+  gad:releaseYear 2023 ;
+  gad:keyFeature "Compact 5.9 inch", "Gimbal Stabilizer Hybrid", "Wireless Charging" ;
+  gad:weightGr 172 .
+
+gad:ROG_Phone_8 a gad:Smartphone ;
+  gad:hasBrand gad:Asus ;
+  gad:hasComponent gad:Snapdragon_8_Gen_3, gad:RAM_12GB_LPDDR5X, gad:Batt_5500 ;
+  gad:priceIDR 10999000 ;
+  gad:releaseYear 2024 ;
+  gad:keyFeature "IP68 Gaming Phone", "AniMe Vision (Pro)", "AirTriggers" ;
+  gad:weightGr 225 .
+
+gad:iQOO_12 a gad:Smartphone ;
+  gad:hasBrand gad:Vivo ; 
+  gad:hasComponent gad:Snapdragon_8_Gen_3, gad:RAM_16GB_LPDDR5X, gad:Batt_5000, gad:Chip_Q1 ;
+  gad:priceIDR 10999000 ;
+  gad:releaseYear 2023 ;
+  gad:keyFeature "Supercomputing Chip Q1", "144Hz LTPO", "BMW M Motorsport Design" .
+
+gad:Fujifilm_X100VI a gad:Mirrorless ;
+  gad:hasBrand gad:Fujifilm ;
+  gad:hasComponent gad:Sensor_APS_C_40MP, gad:Chip_X_Processor_5 ;
+  gad:priceIDR 29999000 ;
+  gad:releaseYear 2024 ;
+  gad:keyFeature "Fixed 23mm Lens", "6-Stop IBIS", "Film Sims (Reala Ace)" ;
+  gad:weightGr 521 .
+
+gad:Sony_A6700 a gad:Mirrorless ;
+  gad:hasBrand gad:Sony ;
+  gad:hasComponent gad:Sensor_APS_C_26MP, gad:Chip_Bionz_XR ;
+  gad:priceIDR 21999000 ;
+  gad:releaseYear 2023 ;
+  gad:keyFeature "AI Autofocus", "4K120p", "5-Axis IBIS" ;
+  gad:weightGr 493 .
+
+gad:Canon_EOS_R8 a gad:Mirrorless ;
+  gad:hasBrand gad:Canon ;
+  gad:hasComponent gad:Sensor_FullFrame_24MP, gad:Chip_Digic_X ;
+  gad:priceIDR 21999000 ;
+  gad:releaseYear 2023 ;
+  gad:keyFeature "Lightweight Full Frame", "40fps E-Shutter", "4K60 Uncropped" ;
+  gad:weightGr 461 .
+
+gad:Nikon_Zf a gad:Mirrorless ;
+  gad:hasBrand gad:Nikon ;
+  gad:hasComponent gad:Sensor_FullFrame_24MP, gad:Chip_Expeed_7 ;
+  gad:priceIDR 33999000 ;
+  gad:releaseYear 2023 ;
+  gad:keyFeature "Retro Design", "8-Stop VR", "Pixel Shift Shooting" ;
+  gad:weightGr 710 .
+
+gad:Insta360_Ace_Pro a gad:Mirrorless ; 
+  gad:hasBrand gad:Insta360 ;
+  gad:hasComponent gad:Sensor_1_1_3_Inch, gad:Chip_AI_5nm ;
+  gad:priceIDR 7199000 ;
+  gad:releaseYear 2023 ;
+  gad:keyFeature "8K Video", "Leica Lens", "Flip Screen", "AI Highlights" ;
+  gad:weightGr 180 .
+
+gad:DJI_Osmo_Action_4 a gad:Mirrorless ;
+  gad:hasBrand gad:DJI ;
+  gad:hasComponent gad:Sensor_1_1_3_Inch ;
+  gad:priceIDR 5399000 ;
+  gad:releaseYear 2023 ;
+  gad:keyFeature "Low Light Imaging", "10-bit D-Log M", "Magnetic Quick Release" ;
+  gad:weightGr 145 .
+
+gad:Ricoh_GR_IIIx a gad:Mirrorless ;
+  gad:hasBrand gad:Ricoh ;
+  gad:hasComponent gad:Sensor_APS_C_24MP ;
+  gad:priceIDR 19999000 ;
+  gad:releaseYear 2021 ;
+  gad:keyFeature "Snap Focus", "Pocketable", "40mm Equivalent Lens" ;
+  gad:weightGr 262 .
+
+gad:Leica_Q3 a gad:Mirrorless ;
+  gad:hasBrand gad:Leica ;
+  gad:hasComponent gad:Sensor_FullFrame_60MP ;
+  gad:priceIDR 109000000 ;
+  gad:releaseYear 2023 ;
+  gad:keyFeature "Summilux 28mm f/1.7", "Wireless Charging", "Tilt Screen", "8K Video" ;
+  gad:weightGr 743 .
+
+gad:DJI_Mini_2_SE a gad:Drone ;
+  gad:hasBrand gad:DJI ;
+  gad:hasComponent gad:Cam_2_7K ;
+  gad:priceIDR 5999000 ;
+  gad:maxFlightTimeMin 31 ;
+  gad:keyFeature "Under 249g", "10km Transmission", "Level 5 Wind Resistance" ;
+  gad:weightGr 246 .
+
+gad:FIMI_X8_Mini_V2 a gad:Drone ;
+  gad:hasBrand gad:Fimi ;
+  gad:hasComponent gad:Cam_4K ;
+  gad:priceIDR 5600000 ;
+  gad:maxFlightTimeMin 37 ;
+  gad:keyFeature "RokLink 9km", "Fast Charging Battery", "Night Mode" ;
+  gad:weightGr 245 .
+
+gad:Autel_Evo_Nano_Plus a gad:Drone ;
+  gad:hasBrand gad:Autel ;
+  gad:hasComponent gad:Sensor_1_1_2_Inch ;
+  gad:priceIDR 10500000 ;
+  gad:maxFlightTimeMin 28 ;
+  gad:keyFeature "RYYB Color Filter", "Three-Way Obstacle Avoidance", "PDAF + CDAF" ;
+  gad:weightGr 249 .
+
+gad:DJI_Air_2S a gad:Drone ;
+  gad:hasBrand gad:DJI ;
+  gad:hasComponent gad:Sensor_1inch_5_4K ;
+  gad:priceIDR 13500000 ;
+  gad:maxFlightTimeMin 31 ;
+  gad:keyFeature "MasterShots", "ADS-B AirSense", "5.4K Video" ;
+  gad:weightGr 595 .
+
+gad:Garmin_Forerunner_165 a gad:Smartwatch ;
+  gad:hasBrand gad:Garmin ;
+  gad:hasComponent gad:Display_AMOLED ;
+  gad:priceIDR 4299000 ;
+  gad:releaseYear 2024 ;
+  gad:keyFeature "Running Power", "Morning Report", "Nap Detection", "11 Days Battery" ;
+  gad:weightGr 39 .
+
+gad:Huawei_Watch_Fit_3 a gad:Smartwatch ;
+  gad:hasBrand gad:Huawei ;
+  gad:hasComponent gad:Display_AMOLED_Square ;
+  gad:priceIDR 1999000 ;
+  gad:releaseYear 2024 ;
+  gad:keyFeature "Ultra-Slim Design", "10 Days Battery", "Calorie Management" ;
+  gad:weightGr 26 .
+
+gad:Samsung_Galaxy_Fit3 a gad:Smartband ;
+  gad:hasBrand gad:Samsung ;
+  gad:hasComponent gad:Display_AMOLED_Rect ;
+  gad:priceIDR 799000 ;
+  gad:releaseYear 2024 ;
+  gad:keyFeature "Aluminum Body", "Fall Detection", "13 Days Battery" ;
+  gad:weightGr 36 .
+
+gad:Xiaomi_Smart_Band_8_Pro a gad:Smartband ;
+  gad:hasBrand gad:Xiaomi ;
+  gad:hasComponent gad:Display_AMOLED_Large ;
+  gad:priceIDR 999000 ;
+  gad:releaseYear 2024 ;
+  gad:keyFeature "Built-in GNSS", "150+ Sports Modes", "60Hz Refresh Rate" .
+
+gad:Coros_Pace_3 a gad:Smartwatch ;
+  gad:hasBrand gad:Coros ;
+  gad:hasComponent gad:Display_MIP ;
+  gad:priceIDR 4350000 ;
+  gad:releaseYear 2023 ;
+  gad:keyFeature "Dual-Frequency GPS", "30g Lightweight", "Breadcrumb Navigation" ;
+  gad:weightGr 30 .
+
+gad:Amazfit_Active a gad:Smartwatch ;
+  gad:hasBrand gad:Amazfit ;
+  gad:hasComponent gad:Display_AMOLED ;
+  gad:priceIDR 1899000 ;
+  gad:releaseYear 2023 ;
+  gad:keyFeature "Readiness Score", "Zepp Coach", "Bluetooth Calling" .
+
+gad:Itel_Smartwatch_2_Ultra a gad:Smartwatch ;
+  gad:hasBrand gad:Itel ;
+  gad:priceIDR 450000 ;
+  gad:keyFeature "Budget Ultra Clone", "Bluetooth Calling", "Big Battery" .
+
+gad:Huawei_Watch_GT_4 a gad:Smartwatch ;
+  gad:hasBrand gad:Huawei ;
+  gad:priceIDR 3299000 ;
+  gad:keyFeature "Octagonal Design", "TruSeen 5.5+", "2 Weeks Battery" .
+
+gad:Sony_WF1000XM5 a gad:AudioDevice ;
+  gad:hasBrand gad:Sony ;
+  gad:hasComponent gad:Chip_V2_QN2e ;
+  gad:priceIDR 3999000 ;
+  gad:keyFeature "Best Noise Cancelling", "Hi-Res Wireless", "Head Tracking" .
+
+gad:AirPods_Pro_2_USBC a gad:AudioDevice ;
+  gad:hasBrand gad:Apple ;
+  gad:hasComponent gad:Chip_H2 ;
+  gad:priceIDR 3499000 ;
+  gad:keyFeature "2x ANC", "Adaptive Audio", "Lossless with Vision Pro" .
+
+gad:Galaxy_Buds2_Pro a gad:AudioDevice ;
+  gad:hasBrand gad:Samsung ;
+  gad:priceIDR 1999000 ;
+  gad:keyFeature "24-bit Hi-Fi", "360 Audio", "Compact Fit" .
+
+gad:Moondrop_Space_Travel a gad:AudioDevice ;
+  gad:hasBrand gad:Moondrop ;
+  gad:priceIDR 399000 ;
+  gad:keyFeature "Budget ANC", "Anime Voice Prompt", "Transparent Case" .
+
+gad:Eggel_Terra_3 a gad:AudioDevice ;
+  gad:hasBrand gad:Eggel ;
+  gad:priceIDR 650000 ;
+  gad:keyFeature "360 Sound", "IP67 Waterproof", "Local Brand", "Deep Bass" .
+
 #################################################################
-# Detailed Components (RAM, SoC, Display, Sensors)
+# COMPONENTS
 #################################################################
 
-# SoC & Processors
-gad:M3_Max_SoC a gad:SoC ; gad:socModelName "Apple M3 Max" ; gad:supportsNPU true .
-gad:M3_SoC a gad:SoC ; gad:socModelName "Apple M3" .
-gad:A17_Pro_SoC a gad:SoC ; gad:socModelName "Apple A17 Pro" .
-gad:Snapdragon_8_Gen_3 a gad:SoC ; gad:socModelName "Snapdragon 8 Gen 3" ; gad:supportsNPU true .
-gad:Snapdragon_8_Gen_2 a gad:SoC ; gad:socModelName "Snapdragon 8 Gen 2" .
-gad:Snapdragon_8_Plus_Gen_1 a gad:SoC ; gad:socModelName "Snapdragon 8+ Gen 1" .
-gad:Dimensity_9300 a gad:SoC ; gad:socModelName "MediaTek Dimensity 9300" ; gad:supportsNPU true .
-gad:Kirin_9010 a gad:SoC ; gad:socModelName "HiSilicon Kirin 9010" ; gad:supportsNPU true .
-gad:Tensor_G3_SoC a gad:SoC ; gad:socModelName "Google Tensor G3" ; gad:supportsNPU true .
-gad:Core_Ultra_9 a gad:CPU ; gad:cpuModelName "Intel Core Ultra 9 185H" .
-gad:Core_Ultra_7 a gad:CPU ; gad:cpuModelName "Intel Core Ultra 7 155H" .
-gad:Core_i7_12th a gad:CPU ; gad:cpuModelName "Intel Core i7-1255U" .
-gad:Core_i9_14900HX a gad:CPU ; gad:cpuModelName "Intel Core i9-14900HX" .
+gad:Core_Ultra_5 a gad:CPU ; gad:cpuModelName "Intel Core Ultra 5 125H" .
+gad:Core_i5_12450H a gad:CPU ; gad:cpuModelName "Intel Core i5-12450H" .
+gad:Ryzen_9_8945HS a gad:CPU ; gad:cpuModelName "AMD Ryzen 9 8945HS" .
+gad:Core_i7_13620H a gad:CPU ; gad:cpuModelName "Intel Core i7-13620H" .
+gad:Ryzen_5_6600H a gad:CPU ; gad:cpuModelName "AMD Ryzen 5 6600H" .
+gad:Ryzen_7_5700U a gad:CPU ; gad:cpuModelName "AMD Ryzen 7 5700U" .
+gad:Exynos_1480 a gad:SoC ; gad:socModelName "Exynos 1480" ; gad:supportsNPU true .
+gad:Exynos_1380 a gad:SoC ; gad:socModelName "Exynos 1380" .
+gad:Dimensity_7200_Ultra a gad:SoC ; gad:socModelName "Dimensity 7200 Ultra" .
+gad:Snapdragon_8s_Gen_3 a gad:SoC ; gad:socModelName "Snapdragon 8s Gen 3" ; gad:supportsNPU true .
+gad:Dimensity_8300_Ultra a gad:SoC ; gad:socModelName "Dimensity 8300 Ultra" ; gad:supportsNPU true .
+gad:Dimensity_8200_Ult a gad:SoC ; gad:socModelName "Dimensity 8200 Ultimate" .
+gad:Dimensity_6080 a gad:SoC ; gad:socModelName "Dimensity 6080" .
+gad:Helio_G99_Ult a gad:SoC ; gad:socModelName "Helio G99 Ultimate" .
+gad:Dimensity_7050 a gad:SoC ; gad:socModelName "Dimensity 7050" .
+gad:Snapdragon_6_Gen_1 a gad:SoC ; gad:socModelName "Snapdragon 6 Gen 1" .
+gad:A15_Bionic a gad:SoC ; gad:socModelName "Apple A15 Bionic" .
+gad:Chip_Q1 a gad:SoC ; gad:socModelName "iQOO Q1 Chip" .
+gad:Chip_X_Processor_5 a gad:Component .
+gad:Chip_Bionz_XR a gad:Component .
+gad:Chip_Digic_X a gad:Component .
+gad:Chip_Expeed_7 a gad:Component .
+gad:Chip_AI_5nm a gad:SoC .
+gad:Chip_V2_QN2e a gad:SoC .
+gad:Chip_H2 a gad:SoC .
 
-# RAM Modules (Detailed)
-gad:RAM_128GB_DDR5 a gad:RAM ; gad:ramSize 128 ; gad:ramTechnology "DDR5" .
-gad:RAM_64GB_Unified a gad:RAM ; gad:ramSize 64 ; gad:ramTechnology "Unified Memory" .
-gad:RAM_64GB_DDR5 a gad:RAM ; gad:ramSize 64 ; gad:ramTechnology "DDR5" .
-gad:RAM_32GB_LPDDR5X a gad:RAM ; gad:ramSize 32 ; gad:ramTechnology "LPDDR5X" .
-gad:RAM_32GB_DDR5 a gad:RAM ; gad:ramSize 32 ; gad:ramTechnology "DDR5" .
+gad:RTX_4050_Laptop a gad:GPU ; gad:vramSize 6 ; gad:supportsCUDA true .
+gad:RX_6500M a gad:GPU ; gad:vramSize 4 .
+
 gad:RAM_16GB_LPDDR5X a gad:RAM ; gad:ramSize 16 ; gad:ramTechnology "LPDDR5X" .
-gad:RAM_16GB_LPDDR5 a gad:RAM ; gad:ramSize 16 ; gad:ramTechnology "LPDDR5" .
-gad:RAM_16GB_Unified a gad:RAM ; gad:ramSize 16 ; gad:ramTechnology "Unified Memory" .
-gad:RAM_12GB_LPDDR5X a gad:RAM ; gad:ramSize 12 ; gad:ramTechnology "LPDDR5X" .
-gad:RAM_12GB_LPDDR5 a gad:RAM ; gad:ramSize 12 ; gad:ramTechnology "LPDDR5" .
-gad:RAM_8GB_LPDDR5 a gad:RAM ; gad:ramSize 8 ; gad:ramTechnology "LPDDR5" .
+gad:RAM_16GB_DDR5 a gad:RAM ; gad:ramSize 16 ; gad:ramTechnology "DDR5" .
+gad:RAM_16GB_DDR4 a gad:RAM ; gad:ramSize 16 ; gad:ramTechnology "DDR4" .
+gad:RAM_4GB a gad:RAM ; gad:ramSize 4 .
 
-# Batteries (mAh for Phones/Wearables, Wh for Laptops/Drones)
-gad:Batt_5000 a gad:Battery ; gad:batteryCapacitymAh 5000 .
-gad:Batt_5400 a gad:Battery ; gad:batteryCapacitymAh 5400 .
-gad:Batt_5600 a gad:Battery ; gad:batteryCapacitymAh 5600 .
-gad:Batt_5200 a gad:Battery ; gad:batteryCapacitymAh 5200 .
-gad:Batt_5050 a gad:Battery ; gad:batteryCapacitymAh 5050 .
-gad:Batt_4441 a gad:Battery ; gad:batteryCapacitymAh 4441 .
-gad:Batt_4700 a gad:Battery ; gad:batteryCapacitymAh 4700 .
-gad:Batt_4400 a gad:Battery ; gad:batteryCapacitymAh 4400 .
-gad:Batt_425 a gad:Battery ; gad:batteryCapacitymAh 425 .
-gad:Batt_1720 a gad:Battery ; gad:batteryCapacitymAh 1720 .
-gad:Batt_99Wh a gad:Battery ; gad:batteryCapacityWh 99.9 .
-gad:Batt_95Wh a gad:Battery ; gad:batteryCapacityWh 95.2 .
-gad:Batt_90Wh a gad:Battery ; gad:batteryCapacityWh 90.0 .
-gad:Batt_70Wh a gad:Battery ; gad:batteryCapacityWh 69.6 .
-gad:Batt_68Wh a gad:Battery ; gad:batteryCapacityWh 68.0 .
-gad:Batt_57Wh a gad:Battery ; gad:batteryCapacityWh 57.0 .
-gad:Batt_52Wh a gad:Battery ; gad:batteryCapacityWh 52.6 .
-gad:Batt_47Wh a gad:Battery ; gad:batteryCapacityWh 47.7 .
-gad:Batt_Drone_77Wh a gad:Battery ; gad:batteryCapacityWh 77.0 .
-gad:Batt_Drone_62Wh a gad:Battery ; gad:batteryCapacityWh 62.6 .
-gad:Batt_Drone_31Wh a gad:Battery ; gad:batteryCapacityWh 31.7 .
+gad:SSD_512GB_Gen4 a gad:Storage ; gad:storageSizeGB 512 ; gad:storageTechnology "PCIe Gen 4" .
+gad:SSD_512GB_Gen3 a gad:Storage ; gad:storageSizeGB 512 ; gad:storageTechnology "PCIe Gen 3" .
 
-# Displays
-gad:Display_LiquidRetinaXDR a gad:Display ; gad:displayPanel "Mini-LED" ; gad:refreshRateHz 120 .
-gad:Display_Dynamic_AMOLED_2X a gad:Display ; gad:displayPanel "Dynamic AMOLED 2X" ; gad:refreshRateHz 120 .
-gad:Display_OLED_240Hz a gad:Display ; gad:displayPanel "OLED" ; gad:refreshRateHz 240 .
-gad:Display_MiniLED_4K a gad:Display ; gad:displayPanel "Mini-LED" ; gad:refreshRateHz 120 .
-gad:Display_MiniLED_3K a gad:Display ; gad:displayPanel "Mini-LED" ; gad:refreshRateHz 165 .
-gad:Display_OLED_Touch a gad:Display ; gad:displayPanel "OLED" ; gad:refreshRateHz 120 .
-gad:Display_PixelSense_Flow a gad:Display ; gad:displayPanel "IPS LCD" ; gad:refreshRateHz 120 .
-gad:Display_LiquidRetina a gad:Display ; gad:displayPanel "IPS LED" ; gad:refreshRateHz 60 .
+gad:Display_OLED_4K a gad:Display ; gad:displayPanel "OLED" ; gad:refreshRateHz 60 .
+gad:Display_OLED_2_8K a gad:Display ; gad:displayPanel "OLED" ; gad:refreshRateHz 120 .
+gad:Display_QHD_240Hz a gad:Display ; gad:displayPanel "IPS" ; gad:refreshRateHz 240 .
+gad:Display_PixelSense_Touch a gad:Display ; gad:displayPanel "IPS Touch" ; gad:refreshRateHz 120 .
+gad:Display_Dual_OLED_3K a gad:Display ; gad:displayPanel "OLED" ; gad:refreshRateHz 120 .
+gad:Display_2_5K_IPS a gad:Display ; gad:displayPanel "IPS" ; gad:refreshRateHz 60 .
+gad:Display_AMOLED a gad:Display ; gad:displayPanel "AMOLED" .
+gad:Display_AMOLED_Square a gad:Display ; gad:displayPanel "AMOLED" .
+gad:Display_AMOLED_Rect a gad:Display ; gad:displayPanel "AMOLED" .
+gad:Display_AMOLED_Large a gad:Display ; gad:displayPanel "AMOLED" .
+gad:Display_MIP a gad:Display ; gad:displayPanel "MIP Transflective" .
 
-# Camera Systems
-gad:Cam_Quad_Leica a gad:CameraModule ; gad:cameraMegapixel 50 ; gad:hasOIS true ; gad:keyFeature "Leica Optics" .
-gad:Cam_Quad_Periscope a gad:CameraModule ; gad:cameraMegapixel 50 ; gad:hasOIS true .
-gad:Cam_Zeiss_APO a gad:CameraModule ; gad:cameraMegapixel 50 ; gad:hasOIS true ; gad:keyFeature "Zeiss T* Coating" .
-gad:Cam_PopUp_Retractable a gad:CameraModule ; gad:cameraMegapixel 50 ; gad:keyFeature "Retractable Mechanism" .
-gad:Sensor_FullFrame_45MP a gad:CameraModule ; gad:ibis true .
-gad:Sensor_FullFrame_33MP a gad:CameraModule ; gad:ibis true .
-gad:Sensor_FullFrame_24MP a gad:CameraModule ; gad:ibis true .
-gad:Sensor_FullFrame_12MP a gad:CameraModule ; gad:ibis true .
-gad:Sensor_APS_C_40MP a gad:CameraModule ; gad:ibis true .
-gad:Sensor_1inch_4K a gad:CameraModule ; gad:video4k60 true .
-gad:Cam_50MP_Xiaomi a gad:CameraModule ; gad:cameraMegapixel 50 ; gad:hasOIS true .
-gad:Cam_50MP_1inch a gad:CameraModule ; gad:cameraMegapixel 50 ; gad:hasOIS true .
-gad:Cam_50MP_PopUp a gad:CameraModule ; gad:cameraMegapixel 50 .
-gad:Hasselblad_Triple_Cam a gad:CameraModule ; gad:video4k60 true .
-gad:Dual_Cam_4K a gad:CameraModule ; gad:video4k60 true .
-gad:FPV_Camera_4K a gad:CameraModule ; gad:video4k60 true .
+gad:Cam_50MP_Samsung a gad:CameraModule ; gad:cameraMegapixel 50 ; gad:hasOIS true .
+gad:Cam_200MP_Samsung a gad:CameraModule ; gad:cameraMegapixel 200 ; gad:hasOIS true .
+gad:Cam_50MP_SonyLYT a gad:CameraModule ; gad:cameraMegapixel 50 ; gad:hasOIS true .
+gad:Cam_50MP_SonyIMX882 a gad:CameraModule ; gad:cameraMegapixel 50 ; gad:hasOIS true .
+gad:Sensor_APS_C_26MP a gad:CameraModule ; gad:ibis true .
+gad:Sensor_1_1_3_Inch a gad:CameraModule ; gad:video4k60 true .
+gad:Sensor_APS_C_24MP a gad:CameraModule ; gad:ibis true .
+gad:Sensor_FullFrame_60MP a gad:CameraModule ; gad:ibis true .
+gad:Cam_2_7K a gad:CameraModule ; gad:video4k60 false .
+gad:Cam_4K a gad:CameraModule ; gad:video4k60 true .
+gad:Sensor_1_1_2_Inch a gad:CameraModule .
+gad:Sensor_1inch_5_4K a gad:CameraModule ; gad:video4k60 true .
 
-# Storage
-gad:SSD_1TB_Gen4 a gad:Storage ; gad:storageSizeGB 1000 ; gad:storageTechnology "PCIe Gen 4" .
-
-# Other
-gad:HealthSensor_Samsung a gad:HealthSensor .
-gad:HealthSensor_Garmin_Elevate a gad:HealthSensor .
-gad:HealthSensor_Generic a gad:HealthSensor .
-gad:V1_Processor_Audio a gad:Component .
-gad:GP2_Processor a gad:Component .
-gad:Chip_Bose_Custom a gad:Component .
-gad:Chip_Sennheiser_Custom a gad:Component .
-gad:AI_Processing_Unit a gad:Component .
+gad:Batt_75Wh a gad:Battery ; gad:batteryCapacityWh 75.0 .
+gad:Batt_53Wh a gad:Battery ; gad:batteryCapacityWh 53.5 .
+gad:Batt_65Wh a gad:Battery ; gad:batteryCapacityWh 65.0 .
+gad:Batt_6000 a gad:Battery ; gad:batteryCapacitymAh 6000 .
+gad:Batt_5500 a gad:Battery ; gad:batteryCapacitymAh 5500 .
+gad:Batt_3240 a gad:Battery ; gad:batteryCapacitymAh 3240 .
+gad:Batt_4300 a gad:Battery ; gad:batteryCapacitymAh 4300 .
 
 #################################################################
-# SWRL Rules (13 Rules)
+# SWRL Rules
 #################################################################
+# Catatan: SWRL Rules adalah ekstensi di luar SROIQ murni.
+# Reasoner mungkin akan melaporkan "SROIQ(D) + Rules" jika ini diaktifkan.
 
-# Rule 1: Laptop with CUDA GPU & VRAM >= 8GB -> Training Model AI
 :Rule_Laptop_AI a swrl:Imp ;
   swrl:body (
     [ a swrl:ClassAtom ; swrl:classPredicate gad:Laptop ; swrl:argument1 :l ]
@@ -601,7 +1025,6 @@ gad:AI_Processing_Unit a gad:Component .
     [ a swrl:IndividualPropertyAtom ; swrl:propertyPredicate gad:meetsRequirement ; swrl:argument1 :l ; swrl:argument2 gad:Training_Model_AI ]
   ) .
 
-# Rule 2: Laptop with RAM >= 32GB -> Video Editing
 :Rule_Laptop_VideoEdit a swrl:Imp ;
   swrl:body (
     [ a swrl:ClassAtom ; swrl:classPredicate gad:Laptop ; swrl:argument1 :l ]
@@ -614,7 +1037,6 @@ gad:AI_Processing_Unit a gad:Component .
     [ a swrl:IndividualPropertyAtom ; swrl:propertyPredicate gad:meetsRequirement ; swrl:argument1 :l ; swrl:argument2 gad:Video_Editing ]
   ) .
 
-# Rule 3: Smartphone with RAM >= 12GB -> Mobile Build/Gaming
 :Rule_Smartphone_Gaming a swrl:Imp ;
   swrl:body (
     [ a swrl:ClassAtom ; swrl:classPredicate gad:Smartphone ; swrl:argument1 :s ]
@@ -627,7 +1049,6 @@ gad:AI_Processing_Unit a gad:Component .
     [ a swrl:IndividualPropertyAtom ; swrl:propertyPredicate gad:meetsRequirement ; swrl:argument1 :s ; swrl:argument2 gad:Mobile_Build ]
   ) .
 
-# Rule 4: Smartphone with Camera >= 50MP -> Mobile Photo Video
 :Rule_Smartphone_Photo a swrl:Imp ;
   swrl:body (
     [ a swrl:ClassAtom ; swrl:classPredicate gad:Smartphone ; swrl:argument1 :s ]
@@ -640,7 +1061,6 @@ gad:AI_Processing_Unit a gad:Component .
     [ a swrl:IndividualPropertyAtom ; swrl:propertyPredicate gad:meetsRequirement ; swrl:argument1 :s ; swrl:argument2 gad:Mobile_Photo_Video ]
   ) .
 
-# Rule 5: Drone with 4K60 Video -> Aerial Videography
 :Rule_Drone_4K a swrl:Imp ;
   swrl:body (
     [ a swrl:ClassAtom ; swrl:classPredicate gad:Drone ; swrl:argument1 :d ]
@@ -652,7 +1072,6 @@ gad:AI_Processing_Unit a gad:Component .
     [ a swrl:IndividualPropertyAtom ; swrl:propertyPredicate gad:meetsRequirement ; swrl:argument1 :d ; swrl:argument2 gad:Aerial_Videography ]
   ) .
 
-# Rule 6: Drone with Flight Time > 30 min -> Aerial Videography
 :Rule_Drone_FlightTime a swrl:Imp ;
   swrl:body (
     [ a swrl:ClassAtom ; swrl:classPredicate gad:Drone ; swrl:argument1 :d ]
@@ -663,7 +1082,6 @@ gad:AI_Processing_Unit a gad:Component .
     [ a swrl:IndividualPropertyAtom ; swrl:propertyPredicate gad:meetsRequirement ; swrl:argument1 :d ; swrl:argument2 gad:Aerial_Videography ]
   ) .
 
-# Rule 7: Smartwatch -> Wrist Health Tracking
 :Rule_Smartwatch_Health a swrl:Imp ;
   swrl:body (
     [ a swrl:ClassAtom ; swrl:classPredicate gad:Smartwatch ; swrl:argument1 :w ]
@@ -672,7 +1090,6 @@ gad:AI_Processing_Unit a gad:Component .
     [ a swrl:IndividualPropertyAtom ; swrl:propertyPredicate gad:meetsRequirement ; swrl:argument1 :w ; swrl:argument2 gad:Wrist_Health_Tracking ]
   ) .
 
-# Rule 8: Gadget with Storage >= 1000GB (1TB) -> Video Editing
 :Rule_Storage_Big a swrl:Imp ;
   swrl:body (
     [ a swrl:ClassAtom ; swrl:classPredicate gad:Gadget ; swrl:argument1 :x ]
@@ -685,7 +1102,6 @@ gad:AI_Processing_Unit a gad:Component .
     [ a swrl:IndividualPropertyAtom ; swrl:propertyPredicate gad:meetsRequirement ; swrl:argument1 :x ; swrl:argument2 gad:Video_Editing ]
   ) .
 
-# Rule 9: Smartphone Battery >= 5000mAh -> Mobile Photo Video
 :Rule_Battery_Travel a swrl:Imp ;
   swrl:body (
     [ a swrl:ClassAtom ; swrl:classPredicate gad:Smartphone ; swrl:argument1 :s ]
@@ -698,7 +1114,6 @@ gad:AI_Processing_Unit a gad:Component .
     [ a swrl:IndividualPropertyAtom ; swrl:propertyPredicate gad:meetsRequirement ; swrl:argument1 :s ; swrl:argument2 gad:Mobile_Photo_Video ]
   ) .
 
-# Rule 10: Mirrorless with IBIS -> Video Editing
 :Rule_Mirrorless_IBIS a swrl:Imp ;
   swrl:body (
     [ a swrl:ClassAtom ; swrl:classPredicate gad:Mirrorless ; swrl:argument1 :m ]
@@ -710,7 +1125,6 @@ gad:AI_Processing_Unit a gad:Component .
     [ a swrl:IndividualPropertyAtom ; swrl:propertyPredicate gad:meetsRequirement ; swrl:argument1 :m ; swrl:argument2 gad:Video_Editing ]
   ) .
 
-# Rule 11: SoC with NPU -> Training Model AI
 :Rule_NPU_AI a swrl:Imp ;
   swrl:body (
     [ a swrl:ClassAtom ; swrl:classPredicate gad:Gadget ; swrl:argument1 :g ]
@@ -722,7 +1136,6 @@ gad:AI_Processing_Unit a gad:Component .
     [ a swrl:IndividualPropertyAtom ; swrl:propertyPredicate gad:meetsRequirement ; swrl:argument1 :g ; swrl:argument2 gad:Training_Model_AI ]
   ) .
 
-# Rule 12: Laptop with GPU VRAM >= 6GB -> Gaming 1440p
 :Rule_Laptop_Gaming a swrl:Imp ;
   swrl:body (
     [ a swrl:ClassAtom ; swrl:classPredicate gad:Laptop ; swrl:argument1 :l ]
@@ -735,7 +1148,6 @@ gad:AI_Processing_Unit a gad:Component .
     [ a swrl:IndividualPropertyAtom ; swrl:propertyPredicate gad:meetsRequirement ; swrl:argument1 :l ; swrl:argument2 gad:Gaming_1440p ]
   ) .
 
-# Rule 13: Gadget Price > 20 Juta -> Premium Device Status
 :Rule_Premium_Device a swrl:Imp ;
   swrl:body (
     [ a swrl:ClassAtom ; swrl:classPredicate gad:Gadget ; swrl:argument1 :g ]
