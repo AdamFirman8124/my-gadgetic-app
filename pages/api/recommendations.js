@@ -20,12 +20,14 @@ export default async function handler(req, res) {
         VALUES ?type { gad:Smartphone gad:Laptop gad:Drone gad:Smartwatch gad:Smartband gad:Headphones gad:AudioDevice gad:Mirrorless gad:Tablet }
         
         ?id a ?type .
-        ?id rdfs:label ?name .
+        OPTIONAL { ?id rdfs:label ?nameLabel . }
+        BIND(COALESCE(?nameLabel, STRAFTER(STR(?id), "#")) AS ?name)
         BIND(STRAFTER(STR(?type), "#") AS ?categoryLabel)
 
         OPTIONAL { 
           ?id gad:hasBrand ?brand .
-          ?brand rdfs:label ?brandName .
+          OPTIONAL { ?brand rdfs:label ?brandLabel . }
+          BIND(COALESCE(?brandLabel, STRAFTER(STR(?brand), "#")) AS ?brandName)
         }
 
         OPTIONAL { ?id gad:osName ?os . }
@@ -69,6 +71,7 @@ export default async function handler(req, res) {
     `;
 
     const data = await queryOntology(owlPath, query);
+    console.log('[api/recommendations] Results count:', Array.isArray(data) ? data.length : 0);
     res.status(200).json(data);
 
   } catch (error) {
