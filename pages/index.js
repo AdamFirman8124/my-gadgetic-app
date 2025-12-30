@@ -51,6 +51,9 @@ export default function Home() {
   const [uniqueCategories, setUniqueCategories] = useState(['All']);
   const [uniqueBrands, setUniqueBrands] = useState(['All']);
 
+  // Helper function
+  const checkBool = (val) => String(val).toLowerCase() === 'true' || String(val) === '1';
+
   // --- FETCH DATA ---
   useEffect(() => {
     const startTime = Date.now();
@@ -100,8 +103,37 @@ export default function Home() {
             hasIbis: checkBool(item.ibis),
             has4k: checkBool(item.video4k) || checkBool(item.video4k60) || /4k/i.test(features),
 
-            // SWRL GOAL OUTPUT (dari API)
-            requirements: item.requirements ? String(item.requirements) : '',
+            // SWRL GOAL OUTPUT (dari API atau generate di frontend)
+            requirements: item.requirements ? String(item.requirements) : (() => {
+              const reqs = [];
+              const vramVal = parseInt(item.vram || item.vramSize || 0);
+              const ramVal = parseInt(item.ram || item.ramSize || 0);
+              const storageVal = parseInt(item.storage || item.storageSizeGB || 0);
+              const cudaBool = checkBool(item.supportsCUDA);
+              
+              // Log untuk debug
+              if (item.name && (item.name.includes('MSI') || item.name.includes('Dell') || item.name.includes('HP') || item.name.includes('Lenovo') || item.name.includes('ROG') || item.name.includes('Axioo'))) {
+                console.log(`[Frontend] Requirements generation for ${item.name}:`, {
+                  vramVal,
+                  ramVal,
+                  storageVal,
+                  supportsCUDA: item.supportsCUDA,
+                  cudaBool
+                });
+              }
+              
+              if (cudaBool && vramVal >= 8) reqs.push('Training_Model_AI');
+              if (ramVal >= 16 && storageVal >= 512) reqs.push('Video_Editing');
+              if (vramVal >= 6) reqs.push('Gaming_1440p');
+              if (cudaBool) reqs.push('Advanced_AI_Training');
+              
+              const finalReqs = reqs.join(', ');
+              if (item.name && (item.name.includes('MSI') || item.name.includes('Dell') || item.name.includes('HP') || item.name.includes('Lenovo') || item.name.includes('ROG') || item.name.includes('Axioo'))) {
+                console.log(`[Frontend] Generated requirements for ${item.name}:`, finalReqs);
+              }
+              
+              return finalReqs;
+            })(),
             
             // Meta Info
             osName: item.osName || '-',
@@ -115,11 +147,35 @@ export default function Home() {
           };
         });
         
-        setGadgets(cleanData);
-        setDisplayedGadgets(cleanData);
+        // Deduplicate by id instead of name
+        const seenIds = new Set();
+        const dedupedData = cleanData.filter(item => {
+          const itemId = item.name || String(item.id);
+          if (seenIds.has(itemId)) return false;
+          seenIds.add(itemId);
+          return true;
+        });
         
-        const categories = ['All', ...new Set(cleanData.map(g => g.categoryLabel).filter(Boolean))];
-        const brands = ['All', ...new Set(cleanData.map(g => g.brandName).filter(Boolean))];
+        const laptops = dedupedData.filter(g => g.categoryLabel.toLowerCase().includes('laptop'));
+        const aiReadyLaptops = laptops.filter(g => {
+          const vram = parseInt(g.vram || 0);
+          const hasCuda = String(g.supportsCUDA).toLowerCase() === 'true';
+          return vram > 0 || hasCuda;
+        });
+        
+        console.log('[Frontend] Total from API:', data.length);
+        console.log('[Frontend] After cleaning:', cleanData.length);
+        console.log('[Frontend] After dedup:', dedupedData.length);
+        console.log('[Frontend] Laptops:', laptops.length);
+        console.log('[Frontend] AI-Ready Laptops (VRAM or CUDA):', aiReadyLaptops.length);
+        console.log('[Frontend] Sample laptop data:', laptops.slice(0, 3).map(g => ({name: g.name, vram: g.vram, cuda: g.supportsCUDA})));
+        console.log('[Frontend] Laptop names:', laptops.map(g => g.name).join(', '));
+        
+        setGadgets(dedupedData);
+        setDisplayedGadgets(dedupedData);
+        
+        const categories = ['All', ...new Set(dedupedData.map(g => g.categoryLabel).filter(Boolean))];
+        const brands = ['All', ...new Set(dedupedData.map(g => g.brandName).filter(Boolean))];
         setUniqueCategories(categories.sort());
         setUniqueBrands(brands.sort());
 
@@ -153,10 +209,32 @@ export default function Home() {
         (g.categoryLabel.toLowerCase().includes('drone')) || (g.categoryLabel.toLowerCase().includes('camera'))
       );
     } else if (activePersona === 'AI / ML') {
+      console.log('[Frontend] Before AI/ML filter, result count:', result.length);
+      
       result = result.filter(g => {
         const req = (g.requirements || '').toLowerCase();
-        return req.includes('advanced_ai_training');
+        const vramVal = parseInt(g.vram || 0);
+        const hasCUDA = checkBool(g.supportsCUDA);
+        
+        // AI-Ready jika: 
+        // 1. Ada "advanced_ai_training" atau "training_model_ai" di requirements, OR
+        // 2. Laptop dengan VRAM >= 6 (sufficient untuk AI workloads), OR
+        // 3. Punya CUDA support + VRAM
+        const isAiReady = 
+          req.includes('advanced_ai_training') || 
+          req.includes('training_model_ai') || 
+          (g.categoryLabel && g.categoryLabel.toLowerCase().includes('laptop') && vramVal >= 6) ||
+          (hasCUDA && vramVal > 0);
+        
+        if (!isAiReady && vramVal > 0) {
+          console.log(`[Frontend] Item REJECTED: ${g.name}, req="${req}", VRAM=${g.vram}, CUDA=${hasCUDA}, category=${g.categoryLabel}`);
+        }
+        
+        return isAiReady;
       });
+      
+      console.log('[Frontend] After AI/ML filter, result count:', result.length);
+      console.log('[Frontend] AI-Ready items:', result.map(g => g.name));
     }
 
     if (filters.category !== 'All') {
