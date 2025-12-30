@@ -16,6 +16,14 @@ const formatRupiah = (price) => {
   return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(price);
 };
 
+// --- SWRL GOAL FORMATTER ---
+const formatRequirements = (reqs) => {
+  if (!reqs) return '-';
+  const s = String(reqs).trim();
+  if (!s) return '-';
+  return s;
+};
+
 // --- ICON & COLOR UTILS ---
 const getCategoryInfo = (category) => {
   const cat = category ? category.toLowerCase() : '';
@@ -91,6 +99,9 @@ export default function Home() {
             supportsNPU: checkBool(item.supportsNPU),
             hasIbis: checkBool(item.ibis),
             has4k: checkBool(item.video4k) || checkBool(item.video4k60) || /4k/i.test(features),
+
+            // SWRL GOAL OUTPUT (dari API)
+            requirements: item.requirements ? String(item.requirements) : '',
             
             // Meta Info
             osName: item.osName || '-',
@@ -287,12 +298,11 @@ const GadgetCard = ({ gadget, onClick }) => {
           <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#1E293B', lineHeight: '1.4', marginTop: '4px' }}>{gadget.name}</h3>
         </div>
 
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '20px', marginBottom: '20px' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '20px', marginBottom: '14px' }}>
           {isAudio ? (
              <>
                 {gadget.playbackHours && <SpecPill label={`${gadget.playbackHours} Jam`} />}
                 {gadget.noiseCancellation && <SpecPill label="ANC Active" />}
-                {/* Fallback Feature */}
                 {(!gadget.playbackHours && !gadget.noiseCancellation && gadget.keyFeature) && 
                   <SpecPill label={gadget.keyFeature.split(',')[0].slice(0, 15)} />
                 }
@@ -305,6 +315,16 @@ const GadgetCard = ({ gadget, onClick }) => {
                 {gadget.flightTime && <SpecPill label={`${gadget.flightTime}m Fly`} />}
              </>
           )}
+        </div>
+
+        {/* === SWRL GOAL OUTPUT (DITAMPILKAN DI CARD) === */}
+        <div style={{ padding: '12px 12px', borderRadius: '12px', background: '#F8FAFC', border: '1px solid #E2E8F0', marginBottom: '14px' }}>
+          <div style={{ fontSize: '11px', color: '#64748B', fontWeight: 700, marginBottom: '4px', textTransform: 'uppercase' }}>
+            Meets Requirement (SWRL Goal)
+          </div>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: '#334155', lineHeight: 1.4 }}>
+            {formatRequirements(gadget.requirements)}
+          </div>
         </div>
 
         <div style={{ paddingTop: '16px', borderTop: '1px solid #F1F5F9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -345,6 +365,16 @@ const GadgetModal = ({ gadget, onClose }) => {
             <p style={{ color: '#64748B', fontSize: '16px', marginTop: '4px' }}>{gadget.brandName} • Rilis {gadget.releaseYear || 'N/A'}</p>
           </div>
           <button onClick={onClose} style={{ position: 'absolute', top: '20px', right: '20px', width: '32px', height: '32px', borderRadius: '50%', border: '1px solid #E2E8F0', background: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748B' }}><X size={18} /></button>
+        </div>
+
+        {/* === SWRL GOAL OUTPUT (DITAMPILKAN DI MODAL) === */}
+        <div style={{ padding: '20px 32px', borderBottom: '1px solid #F1F5F9', background: '#F8FAFC' }}>
+          <div style={{ fontSize: '12px', fontWeight: 800, color: '#64748B', textTransform: 'uppercase', marginBottom: '8px' }}>
+            Meets Requirement (SWRL Goal)
+          </div>
+          <div style={{ fontSize: '14px', fontWeight: 700, color: '#334155', lineHeight: 1.5 }}>
+            {formatRequirements(gadget.requirements)}
+          </div>
         </div>
 
         {/* Content Body */}
@@ -417,7 +447,6 @@ const GadgetModal = ({ gadget, onClose }) => {
 
 // --- SUB COMPONENTS ---
 const DetailRow = ({ icon, label, value, fullWidth }) => {
-  // Logic: HIDE ROW jika value kosong/null/0
   if (!value || value === '0' || value === 0 || value === '-' || value === 'null') return null;
 
   return (
