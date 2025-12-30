@@ -152,13 +152,6 @@ export default function Home() {
         (g.has4k) || (g.displayPanel && (g.displayPanel.includes('OLED') || g.displayPanel.includes('Mini'))) ||
         (g.categoryLabel.toLowerCase().includes('drone')) || (g.categoryLabel.toLowerCase().includes('camera'))
       );
-    } else if (activePersona === 'Audiophile') {
-      result = result.filter(g => 
-        g.categoryLabel.toLowerCase().includes('audio') || 
-        g.categoryLabel.toLowerCase().includes('head') ||
-        g.categoryLabel.toLowerCase().includes('ear') ||
-        (g.keyFeature && g.keyFeature.toLowerCase().includes('audio'))
-      );
     }
 
     if (filters.category !== 'All') {
@@ -206,7 +199,6 @@ export default function Home() {
           <PersonaButton active={activePersona === 'General'} onClick={() => setActivePersona('General')} icon={<Sparkles size={16}/>} label="Explore" />
           <PersonaButton active={activePersona === 'Mobile Dev'} onClick={() => setActivePersona('Mobile Dev')} icon={<Code size={16}/>} label="Developer" color="#8B5CF6" />
           <PersonaButton active={activePersona === 'Content Creator'} onClick={() => setActivePersona('Content Creator')} icon={<PenTool size={16}/>} label="Creator" color="#EC4899" />
-          <PersonaButton active={activePersona === 'Audiophile'} onClick={() => setActivePersona('Audiophile')} icon={<Headphones size={16}/>} label="Audiophile" color="#F59E0B" />
         </div>
       </div>
 
