@@ -110,29 +110,28 @@ export default function Home() {
               const ramVal = parseInt(item.ram || item.ramSize || 0);
               const storageVal = parseInt(item.storage || item.storageSizeGB || 0);
               const cudaBool = checkBool(item.supportsCUDA);
+              const npuBool = checkBool(item.supportsNPU);
+              const isLaptop = item.categoryLabel && item.categoryLabel.toLowerCase().includes('laptop');
               
-              // Log untuk debug
-              if (item.name && (item.name.includes('MSI') || item.name.includes('Dell') || item.name.includes('HP') || item.name.includes('Lenovo') || item.name.includes('ROG') || item.name.includes('Axioo'))) {
-                console.log(`[Frontend] Requirements generation for ${item.name}:`, {
-                  vramVal,
-                  ramVal,
-                  storageVal,
-                  supportsCUDA: item.supportsCUDA,
-                  cudaBool
-                });
-              }
+              // S10: Laptop AI Training (Laptop + CUDA + VRAM >= 8)
+              if (isLaptop && cudaBool && vramVal >= 8) reqs.push('Training_Model_AI');
               
-              if (cudaBool && vramVal >= 8) reqs.push('Training_Model_AI');
+              // S14: Video Editing (RAM >= 16 AND Storage >= 512)
               if (ramVal >= 16 && storageVal >= 512) reqs.push('Video_Editing');
-              if (vramVal >= 6) reqs.push('Gaming_1440p');
-              if (cudaBool) reqs.push('Advanced_AI_Training');
               
-              const finalReqs = reqs.join(', ');
-              if (item.name && (item.name.includes('MSI') || item.name.includes('Dell') || item.name.includes('HP') || item.name.includes('Lenovo') || item.name.includes('ROG') || item.name.includes('Axioo'))) {
-                console.log(`[Frontend] Generated requirements for ${item.name}:`, finalReqs);
-              }
+              // S12: Laptop Gaming (Laptop + VRAM >= 6)
+              if (isLaptop && vramVal >= 6) reqs.push('Gaming_1440p');
               
-              return finalReqs;
+              // S16: AI/ML (GPU + VRAM >= 8)
+              if (vramVal >= 8) reqs.push('Advanced_AI_Training');
+              
+              // S11: NPU for AI (SoC + supportsNPU = true)
+              if (npuBool) reqs.push('Training_Model_AI');
+              
+              // Remove duplicates
+              const uniqueReqs = [...new Set(reqs)];
+              
+              return uniqueReqs.join(', ');
             })(),
             
             // Meta Info
