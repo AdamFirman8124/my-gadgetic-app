@@ -46,8 +46,6 @@ gad:hasBrand rdf:type owl:ObjectProperty ;
 ###  http://example.org/gadgetic#hasComponent
 gad:hasComponent rdf:type owl:ObjectProperty ;
                  owl:inverseOf gad:isComponentOf ;
-                 rdf:type owl:AsymmetricProperty ,
-                          owl:IrreflexiveProperty ;
                  rdfs:domain gad:Gadget ;
                  rdfs:range gad:Component .
 
@@ -342,6 +340,19 @@ gad:RAM rdf:type owl:Class ;
         rdfs:subClassOf gad:Component .
 
 
+###  http://example.org/gadgetic#RecommendedFor_AI_MachineLearning
+gad:RecommendedFor_AI_MachineLearning rdf:type owl:Class ;
+                                      owl:equivalentClass [ owl:intersectionOf ( gad:Gadget
+                                                                                 [ rdf:type owl:Restriction ;
+                                                                                   owl:onProperty gad:meetsRequirement ;
+                                                                                   owl:hasValue gad:Advanced_AI_Training
+                                                                                 ]
+                                                                               ) ;
+                                                            rdf:type owl:Class
+                                                          ] ;
+                                      rdfs:subClassOf gad:Gadget .
+
+
 ###  http://example.org/gadgetic#RecommendedFor_AI_Student
 gad:RecommendedFor_AI_Student rdf:type owl:Class ;
                               owl:equivalentClass [ owl:intersectionOf ( gad:Gadget
@@ -373,6 +384,19 @@ gad:RecommendedFor_KreatorKonten rdf:type owl:Class ;
                                                        rdf:type owl:Class
                                                      ] ;
                                  rdfs:subClassOf gad:Gadget .
+
+
+###  http://example.org/gadgetic#RecommendedFor_Mobile_Developer
+gad:RecommendedFor_Mobile_Developer rdf:type owl:Class ;
+                                    owl:equivalentClass [ owl:intersectionOf ( gad:Gadget
+                                                                               [ rdf:type owl:Restriction ;
+                                                                                 owl:onProperty gad:meetsRequirement ;
+                                                                                 owl:hasValue gad:Mobile_Build
+                                                                               ]
+                                                                             ) ;
+                                                          rdf:type owl:Class
+                                                        ] ;
+                                    rdfs:subClassOf gad:Gadget .
 
 
 ###  http://example.org/gadgetic#Smartband
@@ -483,6 +507,10 @@ gad:Advan_Pixelwar rdf:type owl:NamedIndividual ,
                    gad:priceIDR 10999000 ;
                    gad:releaseYear 2023 ;
                    gad:weightGr 1900 .
+
+
+###  http://example.org/gadgetic#Advanced_AI_Training
+gad:Advanced_AI_Training rdf:type owl:NamedIndividual .
 
 
 ###  http://example.org/gadgetic#Aerial_Videography
@@ -2020,12 +2048,15 @@ gad:RAM_16GB_DDR4 rdf:type owl:NamedIndividual ,
 ###  http://example.org/gadgetic#RAM_16GB_DDR5
 gad:RAM_16GB_DDR5 rdf:type owl:NamedIndividual ,
                            gad:RAM ;
+                  gad:isComponentOf gad:Asus_Zenbook_Duo_2024 ;
                   gad:ramSize 16 ;
                   gad:ramTechnology "DDR5" .
 
 
 ###  http://example.org/gadgetic#RAM_16GB_LPDDR5
-gad:RAM_16GB_LPDDR5 rdf:type owl:NamedIndividual .
+gad:RAM_16GB_LPDDR5 rdf:type owl:NamedIndividual ,
+                             gad:RAM ;
+                    gad:ramSize 16 .
 
 
 ###  http://example.org/gadgetic#RAM_16GB_LPDDR5X
@@ -2044,7 +2075,8 @@ gad:RAM_32GB_DDR5 rdf:type owl:NamedIndividual .
 
 
 ###  http://example.org/gadgetic#RAM_32GB_LPDDR5X
-gad:RAM_32GB_LPDDR5X rdf:type owl:NamedIndividual .
+gad:RAM_32GB_LPDDR5X rdf:type owl:NamedIndividual ;
+                     gad:ramSize 32 .
 
 
 ###  http://example.org/gadgetic#RAM_4GB
@@ -2062,7 +2094,8 @@ gad:RAM_64GB_Unified rdf:type owl:NamedIndividual .
 
 
 ###  http://example.org/gadgetic#RAM_8GB
-gad:RAM_8GB rdf:type owl:NamedIndividual .
+gad:RAM_8GB rdf:type owl:NamedIndividual ;
+            gad:ramSize 8 .
 
 
 ###  http://example.org/gadgetic#RAM_8GB_LPDDR5
@@ -2112,7 +2145,8 @@ gad:RTX_4050_Laptop rdf:type owl:NamedIndividual ,
 
 
 ###  http://example.org/gadgetic#RTX_4060_Laptop
-gad:RTX_4060_Laptop rdf:type owl:NamedIndividual .
+gad:RTX_4060_Laptop rdf:type owl:NamedIndividual ;
+                    gad:vramSize 8 .
 
 
 ###  http://example.org/gadgetic#RTX_4070_Laptop
@@ -2124,7 +2158,8 @@ gad:RTX_4080_Laptop rdf:type owl:NamedIndividual .
 
 
 ###  http://example.org/gadgetic#RTX_4090_Laptop
-gad:RTX_4090_Laptop rdf:type owl:NamedIndividual .
+gad:RTX_4090_Laptop rdf:type owl:NamedIndividual ;
+                    gad:vramSize 16 .
 
 
 ###  http://example.org/gadgetic#RX_6500M
@@ -2273,7 +2308,8 @@ gad:S9_SiP_Chip rdf:type owl:NamedIndividual .
 
 
 ###  http://example.org/gadgetic#SSD_1TB_Gen4
-gad:SSD_1TB_Gen4 rdf:type owl:NamedIndividual .
+gad:SSD_1TB_Gen4 rdf:type owl:NamedIndividual ;
+                 gad:storageSizeGB 1000 .
 
 
 ###  http://example.org/gadgetic#SSD_512GB_Gen3
@@ -2789,6 +2825,14 @@ gad:g rdf:type swrl:Variable .
 
 gad:v rdf:type swrl:Variable .
 
+gad:gpu rdf:type swrl:Variable .
+
+gad:vram rdf:type swrl:Variable .
+
+gad:r rdf:type swrl:Variable .
+
+gad:cap rdf:type swrl:Variable .
+
 gad:p rdf:type swrl:Variable .
 
 gad:x rdf:type swrl:Variable .
@@ -2797,11 +2841,49 @@ gad:st rdf:type swrl:Variable .
 
 gad:gb rdf:type swrl:Variable .
 
-gad:r rdf:type swrl:Variable .
-
 gad:rs rdf:type swrl:Variable .
 
 gad:w rdf:type swrl:Variable .
+
+[ <http://swrl.stanford.edu/ontologies/3.3/swrla.owl#isRuleEnabled> "true"^^xsd:boolean ;
+   rdfs:comment "Drone Flight Time" ;
+   rdfs:label "S6" ;
+   rdf:type swrl:Imp ;
+   swrl:body [ rdf:type swrl:AtomList ;
+               rdf:first [ rdf:type swrl:ClassAtom ;
+                           swrl:classPredicate gad:Drone ;
+                           swrl:argument1 gad:d
+                         ] ;
+               rdf:rest [ rdf:type swrl:AtomList ;
+                          rdf:first [ rdf:type swrl:DatavaluedPropertyAtom ;
+                                      swrl:propertyPredicate gad:maxFlightTimeMin ;
+                                      swrl:argument1 gad:d ;
+                                      swrl:argument2 gad:t
+                                    ] ;
+                          rdf:rest [ rdf:type swrl:AtomList ;
+                                     rdf:first [ rdf:type swrl:BuiltinAtom ;
+                                                 swrl:builtin swrlb:greaterThan ;
+                                                 swrl:arguments [ rdf:type rdf:List ;
+                                                                  rdf:first gad:t ;
+                                                                  rdf:rest [ rdf:type rdf:List ;
+                                                                             rdf:first 30 ;
+                                                                             rdf:rest rdf:nil
+                                                                           ]
+                                                                ]
+                                               ] ;
+                                     rdf:rest rdf:nil
+                                   ]
+                        ]
+             ] ;
+   swrl:head [ rdf:type swrl:AtomList ;
+               rdf:first [ rdf:type swrl:IndividualPropertyAtom ;
+                           swrl:propertyPredicate gad:meetsRequirement ;
+                           swrl:argument1 gad:d ;
+                           swrl:argument2 gad:Aerial_Videography
+                         ] ;
+               rdf:rest rdf:nil
+             ]
+ ] .
 
 [ <http://swrl.stanford.edu/ontologies/3.3/swrla.owl#isRuleEnabled> "true"^^xsd:boolean ;
    rdfs:comment "Laptop AI (CUDA & VRAM)" ;
@@ -2917,6 +2999,59 @@ gad:w rdf:type swrl:Variable .
  ] .
 
 [ <http://swrl.stanford.edu/ontologies/3.3/swrla.owl#isRuleEnabled> "true"^^xsd:boolean ;
+   rdfs:comment "AI/Machine Learning" ;
+   rdfs:label "S16" ;
+   rdf:type swrl:Imp ;
+   swrl:body [ rdf:type swrl:AtomList ;
+               rdf:first [ rdf:type swrl:ClassAtom ;
+                           swrl:classPredicate gad:Gadget ;
+                           swrl:argument1 gad:g
+                         ] ;
+               rdf:rest [ rdf:type swrl:AtomList ;
+                          rdf:first [ rdf:type swrl:IndividualPropertyAtom ;
+                                      swrl:propertyPredicate gad:hasComponent ;
+                                      swrl:argument1 gad:g ;
+                                      swrl:argument2 gad:gpu
+                                    ] ;
+                          rdf:rest [ rdf:type swrl:AtomList ;
+                                     rdf:first [ rdf:type swrl:ClassAtom ;
+                                                 swrl:classPredicate gad:GPU ;
+                                                 swrl:argument1 gad:gpu
+                                               ] ;
+                                     rdf:rest [ rdf:type swrl:AtomList ;
+                                                rdf:first [ rdf:type swrl:DatavaluedPropertyAtom ;
+                                                            swrl:propertyPredicate gad:vramSize ;
+                                                            swrl:argument1 gad:gpu ;
+                                                            swrl:argument2 gad:vram
+                                                          ] ;
+                                                rdf:rest [ rdf:type swrl:AtomList ;
+                                                           rdf:first [ rdf:type swrl:BuiltinAtom ;
+                                                                       swrl:builtin swrlb:greaterThanOrEqual ;
+                                                                       swrl:arguments [ rdf:type rdf:List ;
+                                                                                        rdf:first gad:vram ;
+                                                                                        rdf:rest [ rdf:type rdf:List ;
+                                                                                                   rdf:first 8 ;
+                                                                                                   rdf:rest rdf:nil
+                                                                                                 ]
+                                                                                      ]
+                                                                     ] ;
+                                                           rdf:rest rdf:nil
+                                                         ]
+                                              ]
+                                   ]
+                        ]
+             ] ;
+   swrl:head [ rdf:type swrl:AtomList ;
+               rdf:first [ rdf:type swrl:IndividualPropertyAtom ;
+                           swrl:propertyPredicate gad:meetsRequirement ;
+                           swrl:argument1 gad:g ;
+                           swrl:argument2 gad:Advanced_AI_Training
+                         ] ;
+               rdf:rest rdf:nil
+             ]
+ ] .
+
+[ <http://swrl.stanford.edu/ontologies/3.3/swrla.owl#isRuleEnabled> "true"^^xsd:boolean ;
    rdfs:comment "NPU for AI" ;
    rdfs:label "S11" ;
    rdf:type swrl:Imp ;
@@ -2952,6 +3087,100 @@ gad:w rdf:type swrl:Variable .
                            swrl:propertyPredicate gad:meetsRequirement ;
                            swrl:argument1 gad:g ;
                            swrl:argument2 gad:Training_Model_AI
+                         ] ;
+               rdf:rest rdf:nil
+             ]
+ ] .
+
+[ <http://swrl.stanford.edu/ontologies/3.3/swrla.owl#isRuleEnabled> "true"^^xsd:boolean ;
+   rdfs:comment "RAM_Requirement_AI" ;
+   rdfs:label "S14" ;
+   rdf:type swrl:Imp ;
+   swrl:body [ rdf:type swrl:AtomList ;
+               rdf:first [ rdf:type swrl:ClassAtom ;
+                           swrl:classPredicate gad:Gadget ;
+                           swrl:argument1 gad:g
+                         ] ;
+               rdf:rest [ rdf:type swrl:AtomList ;
+                          rdf:first [ rdf:type swrl:IndividualPropertyAtom ;
+                                      swrl:propertyPredicate gad:hasComponent ;
+                                      swrl:argument1 gad:g ;
+                                      swrl:argument2 gad:r
+                                    ] ;
+                          rdf:rest [ rdf:type swrl:AtomList ;
+                                     rdf:first [ rdf:type swrl:DatavaluedPropertyAtom ;
+                                                 swrl:propertyPredicate gad:ramSize ;
+                                                 swrl:argument1 gad:r ;
+                                                 swrl:argument2 gad:cap
+                                               ] ;
+                                     rdf:rest [ rdf:type swrl:AtomList ;
+                                                rdf:first [ rdf:type swrl:BuiltinAtom ;
+                                                            swrl:builtin swrlb:greaterThan ;
+                                                            swrl:arguments [ rdf:type rdf:List ;
+                                                                             rdf:first gad:cap ;
+                                                                             rdf:rest [ rdf:type rdf:List ;
+                                                                                        rdf:first 8 ;
+                                                                                        rdf:rest rdf:nil
+                                                                                      ]
+                                                                           ]
+                                                          ] ;
+                                                rdf:rest rdf:nil
+                                              ]
+                                   ]
+                        ]
+             ] ;
+   swrl:head [ rdf:type swrl:AtomList ;
+               rdf:first [ rdf:type swrl:IndividualPropertyAtom ;
+                           swrl:propertyPredicate gad:meetsRequirement ;
+                           swrl:argument1 gad:g ;
+                           swrl:argument2 gad:Training_Model_AI
+                         ] ;
+               rdf:rest rdf:nil
+             ]
+ ] .
+
+[ <http://swrl.stanford.edu/ontologies/3.3/swrla.owl#isRuleEnabled> "true"^^xsd:boolean ;
+   rdfs:comment "Mobile Developer" ;
+   rdfs:label "S15" ;
+   rdf:type swrl:Imp ;
+   swrl:body [ rdf:type swrl:AtomList ;
+               rdf:first [ rdf:type swrl:ClassAtom ;
+                           swrl:classPredicate gad:Gadget ;
+                           swrl:argument1 gad:g
+                         ] ;
+               rdf:rest [ rdf:type swrl:AtomList ;
+                          rdf:first [ rdf:type swrl:IndividualPropertyAtom ;
+                                      swrl:propertyPredicate gad:hasComponent ;
+                                      swrl:argument1 gad:g ;
+                                      swrl:argument2 gad:r
+                                    ] ;
+                          rdf:rest [ rdf:type swrl:AtomList ;
+                                     rdf:first [ rdf:type swrl:DatavaluedPropertyAtom ;
+                                                 swrl:propertyPredicate gad:ramSize ;
+                                                 swrl:argument1 gad:r ;
+                                                 swrl:argument2 gad:cap
+                                               ] ;
+                                     rdf:rest [ rdf:type swrl:AtomList ;
+                                                rdf:first [ rdf:type swrl:BuiltinAtom ;
+                                                            swrl:builtin swrlb:greaterThanOrEqual ;
+                                                            swrl:arguments [ rdf:type rdf:List ;
+                                                                             rdf:first gad:cap ;
+                                                                             rdf:rest [ rdf:type rdf:List ;
+                                                                                        rdf:first 16 ;
+                                                                                        rdf:rest rdf:nil
+                                                                                      ]
+                                                                           ]
+                                                          ] ;
+                                                rdf:rest rdf:nil
+                                              ]
+                                   ]
+                        ]
+             ] ;
+   swrl:head [ rdf:type swrl:AtomList ;
+               rdf:first [ rdf:type swrl:IndividualPropertyAtom ;
+                           swrl:propertyPredicate gad:meetsRequirement ;
+                           swrl:argument1 gad:g ;
+                           swrl:argument2 gad:Mobile_Build
                          ] ;
                rdf:rest rdf:nil
              ]
@@ -3360,46 +3589,6 @@ gad:w rdf:type swrl:Variable .
                            swrl:propertyPredicate gad:meetsRequirement ;
                            swrl:argument1 gad:s ;
                            swrl:argument2 gad:Mobile_Photo_Video
-                         ] ;
-               rdf:rest rdf:nil
-             ]
- ] .
-
-[ <http://swrl.stanford.edu/ontologies/3.3/swrla.owl#isRuleEnabled> "true"^^xsd:boolean ;
-   rdfs:comment "Drone Flight Time" ;
-   rdfs:label "S6" ;
-   rdf:type swrl:Imp ;
-   swrl:body [ rdf:type swrl:AtomList ;
-               rdf:first [ rdf:type swrl:ClassAtom ;
-                           swrl:classPredicate gad:Drone ;
-                           swrl:argument1 gad:d
-                         ] ;
-               rdf:rest [ rdf:type swrl:AtomList ;
-                          rdf:first [ rdf:type swrl:DatavaluedPropertyAtom ;
-                                      swrl:propertyPredicate gad:maxFlightTimeMin ;
-                                      swrl:argument1 gad:d ;
-                                      swrl:argument2 gad:t
-                                    ] ;
-                          rdf:rest [ rdf:type swrl:AtomList ;
-                                     rdf:first [ rdf:type swrl:BuiltinAtom ;
-                                                 swrl:builtin swrlb:greaterThan ;
-                                                 swrl:arguments [ rdf:type rdf:List ;
-                                                                  rdf:first gad:t ;
-                                                                  rdf:rest [ rdf:type rdf:List ;
-                                                                             rdf:first 30 ;
-                                                                             rdf:rest rdf:nil
-                                                                           ]
-                                                                ]
-                                               ] ;
-                                     rdf:rest rdf:nil
-                                   ]
-                        ]
-             ] ;
-   swrl:head [ rdf:type swrl:AtomList ;
-               rdf:first [ rdf:type swrl:IndividualPropertyAtom ;
-                           swrl:propertyPredicate gad:meetsRequirement ;
-                           swrl:argument1 gad:d ;
-                           swrl:argument2 gad:Aerial_Videography
                          ] ;
                rdf:rest rdf:nil
              ]

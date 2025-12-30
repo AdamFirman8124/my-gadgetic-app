@@ -152,6 +152,11 @@ export default function Home() {
         (g.has4k) || (g.displayPanel && (g.displayPanel.includes('OLED') || g.displayPanel.includes('Mini'))) ||
         (g.categoryLabel.toLowerCase().includes('drone')) || (g.categoryLabel.toLowerCase().includes('camera'))
       );
+    } else if (activePersona === 'AI / ML') {
+      result = result.filter(g => {
+        const req = (g.requirements || '').toLowerCase();
+        return req.includes('advanced_ai_training');
+      });
     }
 
     if (filters.category !== 'All') {
@@ -199,6 +204,7 @@ export default function Home() {
           <PersonaButton active={activePersona === 'General'} onClick={() => setActivePersona('General')} icon={<Sparkles size={16}/>} label="Explore" />
           <PersonaButton active={activePersona === 'Mobile Dev'} onClick={() => setActivePersona('Mobile Dev')} icon={<Code size={16}/>} label="Developer" color="#8B5CF6" />
           <PersonaButton active={activePersona === 'Content Creator'} onClick={() => setActivePersona('Content Creator')} icon={<PenTool size={16}/>} label="Creator" color="#EC4899" />
+          <PersonaButton active={activePersona === 'AI / ML'} onClick={() => setActivePersona('AI / ML')} icon={<Brain size={16}/>} label="AI / ML" color="#10B981" />
         </div>
       </div>
 

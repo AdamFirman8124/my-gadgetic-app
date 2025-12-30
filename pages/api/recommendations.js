@@ -195,6 +195,14 @@ export default async function handler(req, res) {
             )
             BIND("Wrist_Health_Tracking" AS ?reqLabel)
           }
+          UNION
+          {
+            # Advanced_AI_Training (lebih kompatibel dengan data yang ada):
+            ?id gad:hasComponent ?gpuA .
+            ?gpuA a gad:GPU ;
+                  gad:supportsCUDA true .
+            BIND("Advanced_AI_Training" AS ?reqLabel)
+          }
         }
       }
       GROUP BY
